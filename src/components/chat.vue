@@ -68,7 +68,6 @@ export default {
     onMounted(() => {
       emitter.on('Login', (value: String) => {
         state.username = value
-        console.log('kcoka')
       })
 
       emitter.on('Logout', function () {
