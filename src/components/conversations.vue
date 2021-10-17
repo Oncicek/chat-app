@@ -8,10 +8,9 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable */
 import { reactive, onMounted, ref } from 'vue'
 
 export default {
-  setup() {}
+  setup() {},
 }
 </script>

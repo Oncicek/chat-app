@@ -1,32 +1,24 @@
 <template>
-  <div>
-    <div
-      class="view login"
-      v-if="state.username === null || state.username === '' "
-    >
-      <form class="login-form" @submit.prevent="Login">
-        <div class="form-inner">
-          <h1>Login to Firechat</h1>
-          <label for="username">Username</label>
-          <input type="text" v-model="inputUserName" :placeholder="user" />
-          <input type="submit" value="Login" />
-        </div>
-      </form>
-    </div>
-    <div class="view chat" v-else>
-      <h1>Chat view</h1>
+  <div class="container-flex">
+    <div class="view chat">
       <header>
-        <button class="logout" @click="Logout">Logout</button>
         <h1>Welcome: {{ state.username }}</h1>
       </header>
       <section class="chat-box">
         <div
           v-for="message in state.messages"
           :key="message.key"
-          :class="(message.username == state.username ? 'message current-user' : 'message')"
+          :class="
+            message.username == state.username
+              ? 'message current-user'
+              : 'message'
+          "
         >
           <div class="message-inner">
             <div class="username">{{ message.username }}</div>
+            <div class="username">
+              {{ message.timestamp }}
+            </div>
             <div class="content">{{ message.content }}</div>
           </div>
         </div>
@@ -42,36 +34,20 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable */
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import db from '../db'
 
 export default {
-  props: {
-    user: {
-      type: String,
-      required: true
-    }
-  },
-  setup(props: any) {
-    const inputUserName = ref('')
+  setup() {
+    const emitter: any = inject('emitter')
+    let user: String = ''
+
     const inputMessage = ref('')
 
     const state = reactive({
-      username: props.user,
-      messages: []
+      username: user,
+      messages: [],
     })
-
-    const Login = () => {
-      if (inputUserName.value != '' || inputUserName != null) {
-        state.username = inputUserName.value
-        inputUserName.value = ''
-      }
-    }
-
-    const Logout = () => {
-      state.username = ''
-    }
 
     const SendMessage = () => {
       const messageRef = db.database().ref('message')
@@ -81,7 +57,8 @@ export default {
 
       const message = {
         username: state.username,
-        content: inputMessage.value
+        content: inputMessage.value,
+        timestamp: Date.now(),
       }
 
       messageRef.push(message)
@@ -89,44 +66,44 @@ export default {
     }
 
     onMounted(() => {
+      emitter.on('Login', (value: String) => {
+        state.username = value
+        console.log('kcoka')
+      })
+
+      emitter.on('Logout', function () {
+        state.username = ''
+      })
+
       const messageRef = db.database().ref('message')
 
-      messageRef.on('value', snapshot => {
+      messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
         let messages: any = []
 
-        Object.keys(data).forEach(key => {
+        Object.keys(data).forEach((key) => {
           messages.push({
             id: key,
             username: data[key].username,
-            content: data[key].content
+            content: data[key].content,
+            timestamp: data[key].timestamp,
           })
         })
 
         state.messages = messages
       })
     })
+
     return {
-      inputUserName,
-      Login,
       state,
       inputMessage,
       SendMessage,
-      Logout
     }
-  }
+  },
 }
 </script>
 
-<style lang="scss">
-* {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+<style scoped lang="scss">
 .view {
   display: flex;
   justify-content: center;
@@ -234,6 +211,8 @@ export default {
       }
     }
     .chat-box {
+      max-height: 50vh;
+      overflow-y: scroll;
       border-radius: 24px 24px 0px 0px;
       background-color: #fff;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
