@@ -24,7 +24,7 @@ import { reactive, onMounted, ref, inject } from 'vue'
 export default {
   props: {
     person: {
-      type: [],
+      type: Object,
       required: true,
     },
     lastMessage: {
@@ -34,20 +34,8 @@ export default {
   },
 
   setup(props: any) {
-    const emitter: any = inject('emitter')
-    let chatName = ref('')
-
-    const getChat = () => {
-      if (!chatName.value) return
-      chatName.value = props.person.displayName
-      emitter.emit('getChat', chatName.value)
-    }
-
-    console.log(props)
-
     return {
       props,
-      getChat,
     }
   },
 }

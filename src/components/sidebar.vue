@@ -29,7 +29,12 @@
       <favorites />
     </div>
     <div class="row">
-      <people v-for="person in peopleData" :key="person.id" :person="person" />
+      <people
+        v-for="person in peopleData"
+        :key="person.id"
+        :person="person"
+        @click="getChat(person.displayName)"
+      />
     </div>
   </div>
 </template>
@@ -46,6 +51,7 @@ export default {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
     const peopleData = ref([])
+    let chatName = ref('')
 
     let isLogged = ref('')
     let infoTab = ref('')
@@ -55,6 +61,12 @@ export default {
       peopleData.value = response.data
 
       console.log(peopleData.value)
+    }
+
+    const getChat = (person: string) => {
+      chatName.value = person
+      emitter.emit('getChat', chatName.value)
+      console.log(person)
     }
 
     const Login = () => {
@@ -91,6 +103,7 @@ export default {
       infoTab,
       FetchUsersData,
       peopleData,
+      getChat,
     }
   },
 }
