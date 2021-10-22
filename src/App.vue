@@ -10,8 +10,8 @@
       <div class="col" v-if="!isEditing">
         <conversations />
       </div>
-      <div class="col" v-if="!isEditing && isLogged">
-        <chat />
+      <div class="col" v-if="!isEditing && userName">
+        <chat :user="userName" />
       </div>
     </div>
   </div>
@@ -29,7 +29,7 @@ export default {
   setup() {
     const emitter: any = inject('emitter')
     let isEditing = ref(false)
-    let isLogged = ref(false)
+    let userName = ref('')
 
     emitter.on('ShowEditComp', () => {
       ShowEditComp()
@@ -41,18 +41,19 @@ export default {
     }
 
     onMounted(() => {
-      emitter.on('Login', (value: boolean) => {
-        isLogged.value = value
+      emitter.on('Login', (value: string) => {
+        userName.value = value
       })
-      emitter.on('Logout', (value: boolean) => {
-        isLogged.value = value
+
+      emitter.on('Logout', function () {
+        userName.value = ''
       })
     })
 
     return {
       ShowEditComp,
       isEditing,
-      isLogged,
+      userName,
     }
   },
 }

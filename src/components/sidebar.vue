@@ -28,46 +28,59 @@
     <div class="row">
       <favorites />
     </div>
+    <div class="row">
+      <people v-for="person in peopleData" :key="person.id" :person="person" />
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, watch } from 'vue'
+import { reactive, onMounted, ref, inject, watch, computed } from 'vue'
+import axios from 'axios'
 import Favorites from './sidebar/favorites.vue'
+import People from './sidebar/people.vue'
 
 export default {
-  components: { Favorites },
+  components: { Favorites, People },
   setup() {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
+    const peopleData = ref([])
 
-    let isLogged = ref(false)
+    let isLogged = ref('')
     let infoTab = ref('')
 
+    const FetchUsersData = async () => {
+      const response: any = await axios.get('../people.json')
+      peopleData.value = response.data
+
+      console.log(peopleData.value)
+    }
+
     const Login = () => {
-      if (!inputUserName.value) return
-      if (isLogged.value) {
+      if (!inputUserName.value) {
         infoTab.value = 'Please logout first'
         return
       } else {
         infoTab.value = ''
       }
-      isLogged.value = true
+
       emitter.emit('Login', inputUserName.value)
     }
 
     const Logout = () => {
       if (!isLogged) return
-      isLogged.value = false
       inputUserName.value = ''
-      emitter.emit('Logout', isLogged.value)
+      emitter.emit('Logout', inputUserName.value)
     }
 
     const ShowEditComp = () => {
       emitter.emit('ShowEditComp')
     }
 
-    onMounted(() => {})
+    onMounted(() => {
+      FetchUsersData()
+    })
 
     return {
       Login,
@@ -76,6 +89,8 @@ export default {
       isLogged,
       ShowEditComp,
       infoTab,
+      FetchUsersData,
+      peopleData,
     }
   },
 }

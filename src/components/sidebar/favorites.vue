@@ -1,12 +1,13 @@
 <template>
-  <div class="row">
+  <div class="container">
+    <header>Favorites</header>
     <div class="row">
-      <div class="col">
+      <div class="col-1">
         <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
-        <div class="col">
-          <div>kocka</div>
-          <div>kocka</div>
-        </div>
+      </div>
+      <div class="col-10">
+        <div>{{ props.userName }}</div>
+        <div>{{ props.lastMessage }}</div>
       </div>
     </div>
   </div>
@@ -16,6 +17,25 @@
 import { reactive, onMounted, ref } from 'vue'
 
 export default {
-  setup() {},
+  props: {
+    userName: {
+      type: String,
+      required: true,
+    },
+    lastMessage: {
+      type: String,
+      required: false,
+    },
+  },
+
+  setup(props: any) {
+    console.log(props)
+
+    return {
+      props,
+    }
+  },
 }
 </script>
+
+<style lang="scss" scoped></style>

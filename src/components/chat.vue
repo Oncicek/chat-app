@@ -38,14 +38,17 @@ import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import db from '../db'
 
 export default {
-  setup() {
-    const emitter: any = inject('emitter')
-    let user: String = ''
-
+  props: {
+    user: {
+      type: String,
+      required: true,
+    },
+  },
+  setup(props: any) {
     const inputMessage = ref('')
 
     const state = reactive({
-      username: user,
+      username: props.user,
       messages: [],
     })
 
@@ -65,33 +68,26 @@ export default {
       inputMessage.value = ''
     }
 
-    onMounted(() => {
-      emitter.on('Login', (value: String) => {
-        state.username = value
-      })
+    const messageRef = db.database().ref('message')
 
-      emitter.on('Logout', function () {
-        state.username = ''
-      })
+    messageRef.on('value', (snapshot) => {
+      const data = snapshot.val()
+      let messages: any = []
 
-      const messageRef = db.database().ref('message')
-
-      messageRef.on('value', (snapshot) => {
-        const data = snapshot.val()
-        let messages: any = []
-
-        Object.keys(data).forEach((key) => {
-          messages.push({
-            id: key,
-            username: data[key].username,
-            content: data[key].content,
-            timestamp: data[key].timestamp,
-          })
+      Object.keys(data).forEach((key) => {
+        messages.push({
+          id: key,
+          username: data[key].username,
+          content: data[key].content,
+          timestamp: data[key].timestamp,
         })
-
-        state.messages = messages
       })
+
+      state.messages = messages
     })
+
+    onMounted(() => {})
+    onUnmounted(() => {})
 
     return {
       state,
