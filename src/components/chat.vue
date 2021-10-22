@@ -43,12 +43,18 @@ export default {
       type: String,
       required: true,
     },
+    chatName: {
+      default: 'Ahoj',
+      type: String,
+      required: false,
+    },
   },
   setup(props: any) {
     const inputMessage = ref('')
 
     const state = reactive({
       username: props.user,
+      chatName: props.chatName,
       messages: [],
     })
 
@@ -83,7 +89,13 @@ export default {
         })
       })
 
-      state.messages = messages
+      let clearedMsg = messages.filter(
+        (x: any) => x.username == state.username || x.username == state.chatName
+      )
+
+      console.log(clearedMsg)
+
+      state.messages = clearedMsg
     })
 
     onMounted(() => {})

@@ -11,7 +11,7 @@
         <conversations />
       </div>
       <div class="col" v-if="!isEditing && userName">
-        <chat :user="userName" />
+        <chat :user="userName" :chatName="chatName" />
       </div>
     </div>
   </div>
@@ -30,6 +30,7 @@ export default {
     const emitter: any = inject('emitter')
     let isEditing = ref(false)
     let userName = ref('')
+    let chatName = ref('')
 
     emitter.on('ShowEditComp', () => {
       ShowEditComp()
@@ -47,6 +48,10 @@ export default {
 
       emitter.on('Logout', function () {
         userName.value = ''
+      })
+
+      emitter.on('getChat', (value: string) => {
+        chatName.value = value
       })
     })
 

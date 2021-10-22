@@ -2,7 +2,7 @@
   <div>
     <table>
       <tbody>
-        <tr>
+        <tr @click="getChat">
           <td>
             <i
               class="bi-circle"
@@ -19,7 +19,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref } from 'vue'
+import { reactive, onMounted, ref, inject } from 'vue'
 
 export default {
   props: {
@@ -34,10 +34,20 @@ export default {
   },
 
   setup(props: any) {
+    const emitter: any = inject('emitter')
+    let chatName = ref('')
+
+    const getChat = () => {
+      if (!chatName.value) return
+      chatName.value = props.person.displayName
+      emitter.emit('getChat', chatName.value)
+    }
+
     console.log(props)
 
     return {
       props,
+      getChat,
     }
   },
 }
