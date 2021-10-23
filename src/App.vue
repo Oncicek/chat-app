@@ -2,16 +2,16 @@
   <div class="container">
     <div class="row">
       <div class="col sidebarTheme">
-        <sidebar :people="peopleData" />
+        <sidebar :people="sidebarData" :userNameOrig="userName" />
       </div>
       <div class="col" v-if="isEditing">
         <edit :people="peopleData" />
       </div>
-      <div class="col" v-if="!isEditing && userNameId">
+      <div class="col" v-if="!isEditing && userNameId > -1">
         <chat
           :userName="userName"
           :userNameId="userNameId"
-          :chatNameId="chatNameId"
+          :chatNameOrig="chatName"
         />
       </div>
     </div>
@@ -34,12 +34,27 @@ export default {
     let isEditing = ref(false)
     let userName = ref('')
     let userNameId = ref(0)
+    const sidebarData: any = ref([])
+    const chatName: any = ref('')
 
     const FetchUsersData = async () => {
       const response: any = await axios.get('../people.json')
       peopleData.value = response.data
 
-      console.log(peopleData.value)
+      GetSidebarData(peopleData.value)
+
+      userNameId.value = parseInt(
+        peopleData.value.find((x: any) => x.active === true).id
+      )
+      userName.value = peopleData.value.find(
+        (x: any) => x.active === true
+      ).displayName
+    }
+
+    const GetSidebarData = (originalData: any) => {
+      sidebarData.value = originalData.filter((x: any) => x.active === false)
+
+      GetChatName(sidebarData.value)
     }
 
     emitter.on('ShowEditComp', () => {
@@ -48,6 +63,12 @@ export default {
 
     const ShowEditComp = () => {
       isEditing.value = !isEditing.value
+    }
+
+    const GetChatName = (sidebarData: any) => {
+      chatName.value = sidebarData.find(
+        (x: any) => x.active === false
+      ).displayName
     }
 
     const UpdateUserData = (id: number) => {
@@ -60,9 +81,15 @@ export default {
       })
 
       if (peopleData.value) {
-        userNameId.value = peopleData.value.find(
-          (x: any) => x.active === true
-        )?.id
+        userNameId.value = parseInt(
+          peopleData.value.find((x: any) => x.active === true)?.id
+        )
+
+        GetSidebarData(peopleData.value)
+
+        sidebarData.value = peopleData.value.filter(
+          (x: any) => x.active === false
+        )
 
         userName.value = peopleData.value.find(
           (x: any) => x.active === true
@@ -72,16 +99,6 @@ export default {
 
     onMounted(() => {
       FetchUsersData()
-
-      if (peopleData.value) {
-        userNameId.value = peopleData.value.find(
-          (x: any) => x.active === true
-        )?.id
-
-        userName.value = peopleData.value.find(
-          (x: any) => x.active === true
-        )?.displayName
-      }
 
       emitter.on('updateUser', (id: number) => {
         UpdateUserData(id)
@@ -95,6 +112,10 @@ export default {
       userName,
       FetchUsersData,
       peopleData,
+      sidebarData,
+      GetSidebarData,
+      GetChatName,
+      chatName,
     }
   },
 }

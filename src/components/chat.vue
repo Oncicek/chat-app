@@ -1,9 +1,7 @@
 <template>
   <div class="container-flex">
     <div class="view chat">
-      <header>
-        <h1>Welcome: {{ state.username }}</h1>
-      </header>
+      <header>Conversation with {{ SwitchHeader() }}</header>
       <section class="chat-box">
         <div
           v-for="message in state.messages"
@@ -34,42 +32,38 @@
 </template>
 
 <script lang="ts">
-import {
-  reactive,
-  onMounted,
-  ref,
-  inject,
-  onUnmounted,
-  useSSRContext,
-} from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import db from '../db'
 
 export default {
   props: {
     userName: {
       type: String,
-      required: false,
+      required: true,
     },
     userNameId: {
       default: 0,
       type: Number,
       required: true,
     },
-    chatNameId: {
-      default: 0,
-      type: Number,
+    chatNameOrig: {
+      type: String,
       required: true,
     },
   },
   setup(props: any) {
     const emitter: any = inject('emitter')
     const inputMessage = ref('')
-    const conversationId = ref('')
+    const conversationId = ref(0)
+
+    let chatNameId = ref(0)
+    let userName = ref(props.userName)
+    let chatName = ref(props.chatName)
+    let userNameId = ref(props.userNameId)
 
     const state = reactive({
-      userNameId: props.userNameId,
-      chatNameId: props.chatNameId,
-      username: props.userName,
+      userNameId: userNameId.value,
+      username: userName,
       messages: [],
     })
 
@@ -92,13 +86,27 @@ export default {
     }
 
     const GetConversationId = () => {
-      conversationId.value = state.userNameId + '/' + state.chatNameId
-      console.log(conversationId.value)
+      let chatId: number = chatNameId.value
+      conversationId.value = parseInt(state.userNameId) * chatId
+
+      console.log(
+        parseInt(state.userNameId),
+        chatId,
+        parseInt(state.userNameId) * chatId
+      )
+    }
+
+    const SwitchHeader = () => {
+      if (!chatName.value) {
+        return props.chatNameOrig
+      } else {
+        return chatName.value
+      }
     }
 
     const messageRef = db.database().ref('message')
 
-    const GetFreshData = (paramConversationId: string) => {
+    const GetFreshData = (paramConversationId: number) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
         let messages: any = []
@@ -117,17 +125,17 @@ export default {
           (x: any) => x.conversationId == paramConversationId
         )
 
-        console.log(clearedMsg)
-
         state.messages = clearedMsg
       })
     }
 
     onMounted(() => {
-      emitter.on('getChat', (id: number) => {
-        state.chatNameId = id
-        GetFreshData(conversationId.value)
+      emitter.on('getChat', (chat: any) => {
+        chatNameId.value = chat.id
+        chatName.value = chat.chatName
+
         GetConversationId()
+        GetFreshData(conversationId.value)
       })
     })
 
@@ -138,6 +146,11 @@ export default {
       inputMessage,
       SendMessage,
       GetFreshData,
+      conversationId,
+      props,
+      chatName,
+      chatNameId,
+      SwitchHeader,
     }
   },
 }
@@ -148,7 +161,7 @@ export default {
   display: flex;
   justify-content: center;
   min-height: 100vh;
-  background-color: #ea526f;
+  background-color: #aaa;
 
   &.login {
     align-items: center;
@@ -251,7 +264,7 @@ export default {
       }
     }
     .chat-box {
-      max-height: 50vh;
+      max-height: 80vh;
       overflow-y: scroll;
       border-radius: 24px 24px 0px 0px;
       background-color: #fff;

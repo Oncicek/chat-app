@@ -2,23 +2,19 @@
   <div class="container-flex">
     <div class="row">
       <div class="col">
-        <button type="button" class="btn btn-primary" @click="ShowEditComp">
-          Edit
-        </button>
-        <form class="login-form" @submit.prevent="Login">
-          <div class="form-inner">
-            <label for="username">Username</label>
-            <input type="text" v-model="inputUserName" />
-            <label v-if="isLogged" for="username"> {{ infoTab }} </label>
+        <div class="row">
+          <div class="col">
+            <header>{{ userNameOrig }}</header>
           </div>
-        </form>
+          <div class="col">
+            <button type="button" class="btn btn-primary" @click="ShowEditComp">
+              Edit
+            </button>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <button>Converations</button>
-      </div>
-    </div>
+    <div class="row"></div>
     <div class="row">
       <favorites />
     </div>
@@ -27,7 +23,7 @@
         v-for="person in people"
         :key="person.id"
         :person="person"
-        @click="getChat(person.id)"
+        @click="getChat(person.id, person.displayName)"
       />
     </div>
   </div>
@@ -44,22 +40,36 @@ export default {
       type: Object,
       required: true,
     },
+    userNameOrig: {
+      type: String,
+    },
   },
   components: { Favorites, People },
   setup(props: any) {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
+    let userName = ref(props.userName)
 
     let isLogged = ref('')
     let infoTab = ref('')
 
-    const getChat = (id: number) => {
-      emitter.emit('getChat', id)
+    const getChat = (id: number, chatName: string) => {
+      emitter.emit('getChat', { id, chatName })
     }
 
     const ShowEditComp = () => {
       emitter.emit('ShowEditComp')
     }
+
+    const SwitchHeader = () => {
+      if (!userName.value) {
+        return props.userNameOrig
+      } else {
+        return userName.value
+      }
+    }
+
+    console.log(userName.value)
 
     onMounted(() => {})
 
@@ -69,6 +79,7 @@ export default {
       ShowEditComp,
       infoTab,
       getChat,
+      userName,
     }
   },
 }
