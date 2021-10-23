@@ -2,12 +2,6 @@
   <div class="container-flex">
     <div class="row">
       <div class="col">
-        <button type="button" class="btn btn-secondary" @click="Login">
-          Login
-        </button>
-        <button type="button" class="btn btn-secondary" @click="Logout">
-          Logout
-        </button>
         <button type="button" class="btn btn-primary" @click="ShowEditComp">
           Edit
         </button>
@@ -30,10 +24,10 @@
     </div>
     <div class="row">
       <people
-        v-for="person in peopleData"
+        v-for="person in people"
         :key="person.id"
         :person="person"
-        @click="getChat(person.displayName)"
+        @click="getChat(person.id)"
       />
     </div>
   </div>
@@ -41,68 +35,39 @@
 
 <script lang="ts">
 import { reactive, onMounted, ref, inject, watch, computed } from 'vue'
-import axios from 'axios'
 import Favorites from './sidebar/favorites.vue'
 import People from './sidebar/people.vue'
 
 export default {
+  props: {
+    people: {
+      type: Object,
+      required: true,
+    },
+  },
   components: { Favorites, People },
-  setup() {
+  setup(props: any) {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
-    const peopleData = ref([])
-    let chatName = ref('')
 
     let isLogged = ref('')
     let infoTab = ref('')
 
-    const FetchUsersData = async () => {
-      const response: any = await axios.get('../people.json')
-      peopleData.value = response.data
-
-      console.log(peopleData.value)
-    }
-
-    const getChat = (person: string) => {
-      chatName.value = person
-      emitter.emit('getChat', chatName.value)
-      console.log(person)
-    }
-
-    const Login = () => {
-      if (!inputUserName.value) {
-        infoTab.value = 'Please logout first'
-        return
-      } else {
-        infoTab.value = ''
-      }
-
-      emitter.emit('Login', inputUserName.value)
-    }
-
-    const Logout = () => {
-      if (!isLogged) return
-      inputUserName.value = ''
-      emitter.emit('Logout', inputUserName.value)
+    const getChat = (id: number) => {
+      emitter.emit('getChat', id)
     }
 
     const ShowEditComp = () => {
       emitter.emit('ShowEditComp')
     }
 
-    onMounted(() => {
-      FetchUsersData()
-    })
+    onMounted(() => {})
 
     return {
-      Login,
-      Logout,
       inputUserName,
       isLogged,
       ShowEditComp,
       infoTab,
-      FetchUsersData,
-      peopleData,
       getChat,
     }
   },

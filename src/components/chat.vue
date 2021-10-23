@@ -34,32 +34,47 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
+import {
+  reactive,
+  onMounted,
+  ref,
+  inject,
+  onUnmounted,
+  useSSRContext,
+} from 'vue'
 import db from '../db'
 
 export default {
   props: {
-    user: {
-      type: String,
-      required: true,
-    },
-    chatName: {
-      default: 'Ahoj',
+    userName: {
       type: String,
       required: false,
+    },
+    userNameId: {
+      default: 0,
+      type: Number,
+      required: true,
+    },
+    chatNameId: {
+      default: 0,
+      type: Number,
+      required: true,
     },
   },
   setup(props: any) {
     const emitter: any = inject('emitter')
     const inputMessage = ref('')
+    const conversationId = ref('')
 
     const state = reactive({
-      username: props.user,
-      chatName: props.chatName,
+      userNameId: props.userNameId,
+      chatNameId: props.chatNameId,
+      username: props.userName,
       messages: [],
     })
 
     const SendMessage = () => {
+      GetConversationId()
       const messageRef = db.database().ref('message')
       if (inputMessage.value === '' || inputMessage.value === null) {
         return
@@ -69,15 +84,21 @@ export default {
         username: state.username,
         content: inputMessage.value,
         timestamp: Date.now(),
+        conversationId: conversationId.value,
       }
 
       messageRef.push(message)
       inputMessage.value = ''
     }
 
+    const GetConversationId = () => {
+      conversationId.value = state.userNameId + '/' + state.chatNameId
+      console.log(conversationId.value)
+    }
+
     const messageRef = db.database().ref('message')
 
-    const GetFreshData = (paramUserName: string, paramChatName: string) => {
+    const GetFreshData = (paramConversationId: string) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
         let messages: any = []
@@ -88,11 +109,12 @@ export default {
             username: data[key].username,
             content: data[key].content,
             timestamp: data[key].timestamp,
+            conversationId: data[key].conversationId,
           })
         })
 
         let clearedMsg = messages.filter(
-          (x: any) => x.username == paramUserName || x.username == paramChatName
+          (x: any) => x.conversationId == paramConversationId
         )
 
         console.log(clearedMsg)
@@ -102,10 +124,13 @@ export default {
     }
 
     onMounted(() => {
-      emitter.on('getChat', (chatname: string) => {
-        GetFreshData(state.username, chatname)
+      emitter.on('getChat', (id: number) => {
+        state.chatNameId = id
+        GetFreshData(conversationId.value)
+        GetConversationId()
       })
     })
+
     onUnmounted(() => {})
 
     return {

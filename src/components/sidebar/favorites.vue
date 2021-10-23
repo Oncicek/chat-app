@@ -20,7 +20,6 @@ export default {
   props: {
     userName: {
       type: String,
-      required: true,
     },
     lastMessage: {
       type: String,
