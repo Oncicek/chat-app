@@ -74,6 +74,7 @@ export default {
     }
 
     const GetFavoriteData = (originalData: any) => {
+      favoriteData.value = []
       let userFavorite: [] = user.value['myFavorites']
 
       userFavorite.forEach((x: number) => {
@@ -112,6 +113,7 @@ export default {
 
         GetSidebarData(peopleData.value)
         GetUserData(peopleData.value)
+        GetFavoriteData(peopleData.value)
 
         sidebarData.value = peopleData.value.filter(
           (x: any) => x.active === false

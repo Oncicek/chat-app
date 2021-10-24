@@ -51,6 +51,7 @@ export default {
     const emitter: any = inject('emitter')
     const inputMessage = ref('')
     const conversationId = ref(0)
+    let favoriteData: any = ref([])
 
     const state = reactive({
       chatName: props.chatSide['displayName'],
@@ -69,6 +70,7 @@ export default {
       }
 
       const message = {
+        userNameId: state.userNameId,
         username: state.username,
         content: inputMessage.value,
         timestamp: Date.now(),
@@ -80,8 +82,7 @@ export default {
     }
 
     const GetConversationId = () => {
-      state.conversationId =
-        (parseInt(state.userNameId) + 1) * (parseInt(state.chatNameId) + 1)
+      state.conversationId = CalcConvId(state.userNameId, state.chatNameId)
     }
 
     emitter.on('getChat', (chat: any) => {
@@ -94,25 +95,50 @@ export default {
 
     const messageRef = db.database().ref('message')
 
-    const GetFavoriteMessage = (favoritePeople: any, messages: []) => {
-      let favoriteData: any = []
+    const GetFavoriteMessage = (favoritePeople: any, messages: any) => {
+      favoriteData.value = []
 
       for (let i = 0; i < favoritePeople.length; i++) {
         let favs: any = {
-          conversationId: CalcConvId(state.userNameId, favoritePeople[i].id),
-          favoritePersonId: favoritePeople[i].id,
+          convId: CalcConvId(state.userNameId, favoritePeople[i].id) as
+            | number
+            | 0,
+          favoritePersonId: favoritePeople[i].id as number,
           lastMessage: '',
         }
 
-        favoriteData.push(favs)
+        favs.lastMessage = GetLastMessage(messages, favs)
+        favoriteData.value.push(favs)
       }
 
-      console.log(favoriteData)
+      console.log(favoriteData.value)
+      emitter.emit('favMessage', favoriteData.value)
     }
 
     const CalcConvId = (userNameId: string, chatNameId: any) => {
-      console.log('asdf: ' + chatNameId)
       return (parseInt(userNameId) + 1) * (parseInt(chatNameId) + 1)
+    }
+
+    const GetLastMessage = (messages: any, favs: any) => {
+      for (let j = messages.length - 1; j >= 0; j--) {
+        if (messages[j]) {
+          console.log(
+            parseInt(messages[j].conversationId),
+            parseInt(favs.convId),
+            parseInt(messages[j].userNameId),
+            parseInt(favs.favoritePersonId)
+          )
+          if (
+            messages[j].conversationId === favs.convId &&
+            messages[j].userNameId === favs.favoritePersonId
+          ) {
+            console.log(messages[j].content)
+            return messages[j].content
+          }
+          return 'nemprošlo'
+        }
+        return 'Nic'
+      }
     }
 
     const GetFreshData = (conversationId: number) => {
@@ -123,6 +149,7 @@ export default {
         Object.keys(data).forEach((key) => {
           messages.push({
             id: key,
+            userNameId: data[key].userNameId,
             username: data[key].username,
             content: data[key].content,
             timestamp: data[key].timestamp,
@@ -156,6 +183,7 @@ export default {
       GetFreshData,
       props,
       CalcConvId,
+      favoriteData,
     }
   },
 }
