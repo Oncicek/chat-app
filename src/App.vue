@@ -13,9 +13,9 @@
       </div>
       <div class="col" v-if="!isEditing && userNameId > -1">
         <chat
-          :userName="userName"
-          :userNameId="userNameId"
+          :user="user"
           :chatSide="chatSide"
+          :favoritePeople="favoriteData"
         />
       </div>
     </div>
@@ -38,7 +38,7 @@ export default {
     let isEditing = ref(false)
     let userName = ref('')
     let userNameId = ref(0)
-    let user: any = ref([])
+    const user: any = ref([])
     let isLoaded = ref(false)
     const sidebarData: any = ref([])
     const favoriteData: any = ref([])
@@ -52,8 +52,8 @@ export default {
         peopleData.value = response.data
 
         GetSidebarData(peopleData.value)
-        GetFavoriteData(peopleData.value)
         GetUserData(peopleData.value)
+        GetFavoriteData(peopleData.value)
 
         isLoaded.value = true
       }
@@ -67,13 +67,20 @@ export default {
 
     const GetUserData = (originalData: any) => {
       user.value = originalData.find((x: any) => x.active === true)
+
       userNameId.value = parseInt(user.value.id)
       userName.value = user.value.displayName
       myFavorites.value = user.value.myFavorites
     }
 
     const GetFavoriteData = (originalData: any) => {
-      favoriteData.value = originalData.filter((x: any) => x.id in favoriteData)
+      let userFavorite: [] = user.value['myFavorites']
+
+      userFavorite.forEach((x: number) => {
+        favoriteData.value.push(
+          originalData.find((y: any) => parseInt(y.id) === x)
+        )
+      })
     }
 
     emitter.on('ShowEditComp', () => {
@@ -104,6 +111,7 @@ export default {
         )
 
         GetSidebarData(peopleData.value)
+        GetUserData(peopleData.value)
 
         sidebarData.value = peopleData.value.filter(
           (x: any) => x.active === false
@@ -139,6 +147,7 @@ export default {
       GetSidebarData,
       GetFavoriteData,
       chatSide,
+      user,
       isLoaded,
       GetFirstChat,
     }

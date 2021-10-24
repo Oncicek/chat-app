@@ -37,16 +37,13 @@ import db from '../db'
 
 export default {
   props: {
-    userName: {
-      type: String,
-      required: true,
-    },
-    userNameId: {
-      default: 0,
-      type: Number,
-      required: true,
+    user: {
+      type: Object,
     },
     chatSide: {
+      type: Object,
+    },
+    favoritePeople: {
       type: Object,
     },
   },
@@ -55,24 +52,14 @@ export default {
     const inputMessage = ref('')
     const conversationId = ref(0)
 
-    let chatNameId: any = ref(0)
-    let userName: any = ref('')
-    let chatName: any = ref('')
-    let userNameId: any = ref('')
-
     const state = reactive({
-      chatName: chatName,
-      chatNameId: chatNameId,
-      userNameId: userNameId,
+      chatName: props.chatSide['displayName'],
+      chatNameId: props.chatSide['id'],
+      userNameId: props.user['id'],
       conversationId: conversationId,
-      username: userName,
+      username: props.user['displayName'],
       messages: [],
     })
-
-    state.username = props.userName
-    state.userNameId = props.userNameId
-    state.chatName = props.chatSide['displayName']
-    state.chatNameId = props.chatSide['id']
 
     const SendMessage = () => {
       GetConversationId()
@@ -94,7 +81,7 @@ export default {
 
     const GetConversationId = () => {
       state.conversationId =
-        parseInt(state.userNameId + 1) * (parseInt(state.chatNameId) + 1)
+        (parseInt(state.userNameId) + 1) * (parseInt(state.chatNameId) + 1)
     }
 
     emitter.on('getChat', (chat: any) => {
@@ -107,7 +94,28 @@ export default {
 
     const messageRef = db.database().ref('message')
 
-    const GetFreshData = (paramConversationId: number) => {
+    const GetFavoriteMessage = (favoritePeople: any, messages: []) => {
+      let favoriteData: any = []
+
+      for (let i = 0; i < favoritePeople.length; i++) {
+        let favs: any = {
+          conversationId: CalcConvId(state.userNameId, favoritePeople[i].id),
+          favoritePersonId: favoritePeople[i].id,
+          lastMessage: '',
+        }
+
+        favoriteData.push(favs)
+      }
+
+      console.log(favoriteData)
+    }
+
+    const CalcConvId = (userNameId: string, chatNameId: any) => {
+      console.log('asdf: ' + chatNameId)
+      return (parseInt(userNameId) + 1) * (parseInt(chatNameId) + 1)
+    }
+
+    const GetFreshData = (conversationId: number) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
         let messages: any = []
@@ -123,8 +131,10 @@ export default {
         })
 
         let clearedMsg = messages.filter(
-          (x: any) => x.conversationId == paramConversationId
+          (x: any) => x.conversationId === conversationId
         )
+
+        GetFavoriteMessage(props.favoritePeople, messages)
 
         state.messages = clearedMsg
       })
@@ -145,7 +155,7 @@ export default {
       SendMessage,
       GetFreshData,
       props,
-      chatNameId,
+      CalcConvId,
     }
   },
 }

@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <header>Favorites</header>
     <div class="row">
       <div class="col-1">
         <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
