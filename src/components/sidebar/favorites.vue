@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject } from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 
 export default {
   props: {
@@ -24,27 +24,32 @@ export default {
   },
 
   setup(props: any) {
-    console.log(props)
-
     const emitter: any = inject('emitter')
     let favouriteData: any = ref([])
     let lastMessage: any = ref('')
-
-    emitter.on('favMessage', (favMessage: any) => {
-      state.favouriteData =
-        favMessage.find(
-          (x: any) => x.favoritePersonId === props.favoritePerson.id
-        ) || ''
-
-      if (state.favouriteData.lastMessage) {
-        state.lastMessage = state.favouriteData.lastMessage
-      }
-    })
 
     const state = reactive({
       favoritePerson: props.favoritePerson['displayName'],
       favouriteData: favouriteData,
       lastMessage: lastMessage,
+    })
+
+    onMounted(() => {
+      emitter.on('favMessage', (favMessage: any) => {
+        state.favouriteData =
+          favMessage.find(
+            (x: any) => x.favoritePersonId === props.favoritePerson.id
+          ) || ''
+
+        console.log(favMessage)
+
+        if (state.favouriteData.lastMessage) {
+          state.lastMessage = state.favouriteData.lastMessage
+        }
+      })
+    })
+    onUnmounted(() => {
+      emitter.off('favMessage')
     })
 
     return {

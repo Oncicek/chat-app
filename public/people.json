@@ -16,7 +16,9 @@
             "fullName": "ildyko Komárom",
             "active": false,
             "favorite": true,
-            "myFavorites": []
+            "myFavorites": [
+                4
+            ]
         },
         {
             "id": "2",

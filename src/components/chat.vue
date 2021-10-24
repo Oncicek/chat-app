@@ -7,7 +7,7 @@
           v-for="message in state.messages"
           :key="message.key"
           :class="
-            message.username == state.username
+            message.userNameId == state.userNameId
               ? 'message current-user'
               : 'message'
           "
@@ -100,9 +100,7 @@ export default {
 
       for (let i = 0; i < favoritePeople.length; i++) {
         let favs: any = {
-          convId: CalcConvId(state.userNameId, favoritePeople[i].id) as
-            | number
-            | 0,
+          convId: CalcConvId(state.userNameId, favoritePeople[i].id) as number,
           favoritePersonId: favoritePeople[i].id as number,
           lastMessage: '',
         }
@@ -111,7 +109,6 @@ export default {
         favoriteData.value.push(favs)
       }
 
-      console.log(favoriteData.value)
       emitter.emit('favMessage', favoriteData.value)
     }
 
@@ -121,23 +118,12 @@ export default {
 
     const GetLastMessage = (messages: any, favs: any) => {
       for (let j = messages.length - 1; j >= 0; j--) {
-        if (messages[j]) {
-          console.log(
-            parseInt(messages[j].conversationId),
-            parseInt(favs.convId),
-            parseInt(messages[j].userNameId),
-            parseInt(favs.favoritePersonId)
-          )
-          if (
-            messages[j].conversationId === favs.convId &&
-            messages[j].userNameId === favs.favoritePersonId
-          ) {
+        if (messages[j].userNameId) {
+          if (parseInt(messages[j].conversationId) === parseInt(favs.convId)) {
             console.log(messages[j].content)
             return messages[j].content
           }
-          return 'nemprošlo'
         }
-        return 'Nic'
       }
     }
 

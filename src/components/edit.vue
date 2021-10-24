@@ -8,7 +8,44 @@
         <p>Laszlo</p>
       </div>
       <div class="col">
-        <button>Edit</button>
+        <button @click="!state.showModal">Edit</button>
+      </div>
+
+      <div
+        class="modal fade"
+        id="exampleModal"
+        role="dialog"
+        aria-labelledby="exampleModalLabel"
+        v-if="state.showModal"
+      >
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+              <button
+                type="button"
+                class="close"
+                data-dismiss="modal"
+                aria-label="Close"
+              >
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">...</div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-dismiss="modal"
+              >
+                Close
+              </button>
+              <button type="button" class="btn btn-primary">
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
     <hr />
@@ -63,6 +100,10 @@ export default {
     const emitter: any = inject('emitter')
     const selectedUser = ref(-1)
 
+    const state = reactive({
+      showModal: false,
+    })
+
     const findActive = () => {
       selectedUser.value = props.people.find((x: any) => x.active === true).id
     }
@@ -71,7 +112,12 @@ export default {
       emitter.emit('updateUser', selectedUser.value)
     }
 
+    const showModal = () => {
+      state.showModal
+    }
+
     onMounted(() => {
+      state.showModal = false
       findActive()
     })
 
@@ -80,6 +126,7 @@ export default {
       selectedUser,
       findActive,
       updateUser,
+      state,
     }
   },
 }

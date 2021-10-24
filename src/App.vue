@@ -27,11 +27,12 @@ import Sidebar from './components/sidebar.vue'
 import Conversations from './components/conversations.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
+import Dialog from './components/dialog.vue'
 import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import axios from 'axios'
 
 export default {
-  components: { Chat, Sidebar, Conversations, Edit },
+  components: { Chat, Sidebar, Conversations, Edit, Dialog },
   setup() {
     const emitter: any = inject('emitter')
     const peopleData: any = ref([])
@@ -84,17 +85,24 @@ export default {
       })
     }
 
-    emitter.on('ShowEditComp', () => {
-      ShowEditComp()
+    emitter.on('ShowEditComp', (isFromRow: boolean) => {
+      ShowEditComp(isFromRow)
     })
 
-    const ShowEditComp = () => {
-      isEditing.value = !isEditing.value
+    emitter.on('updateUser', (id: number) => {
+      UpdateUserData(id)
+    })
+
+    const ShowEditComp = (isFromRow: boolean) => {
+      if (isFromRow) {
+        isEditing.value = !isFromRow
+      } else {
+        isEditing.value = !isEditing.value
+      }
     }
 
     const GetFirstChat = (originalData: any) => {
       chatSide.value = originalData[0]
-      console.log(chatSide.value)
     }
 
     const UpdateUserData = (id: number) => {

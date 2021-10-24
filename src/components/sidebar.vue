@@ -7,7 +7,11 @@
             <header>{{ userNameOrig }}</header>
           </div>
           <div class="col">
-            <button type="button" class="btn btn-primary" @click="ShowEditComp">
+            <button
+              type="button"
+              class="btn btn-primary"
+              @click="ShowEditComp(false)"
+            >
               Edit
             </button>
           </div>
@@ -27,7 +31,7 @@
         v-for="person in people"
         :key="person.id"
         :person="person"
-        @click="getChat(person.id, person.displayName)"
+        @click="ShowEditComp(true), getChat(person.id, person.displayName)"
       />
     </div>
   </div>
@@ -66,8 +70,8 @@ export default {
       emitter.emit('getChat', { id, chatName })
     }
 
-    const ShowEditComp = () => {
-      emitter.emit('ShowEditComp')
+    const ShowEditComp = (isFromRow: boolean) => {
+      emitter.emit('ShowEditComp', isFromRow)
     }
 
     const SwitchHeader = () => {
