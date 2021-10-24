@@ -1,8 +1,12 @@
 <template>
-  <div class="container">
+  <div class="container" v-if="isLoaded">
     <div class="row">
       <div class="col sidebarTheme">
-        <sidebar :people="sidebarData" :userNameOrig="userName" />
+        <sidebar
+          :people="sidebarData"
+          :userNameOrig="userName"
+          :favoritePeople="favoriteData"
+        />
       </div>
       <div class="col" v-if="isEditing">
         <edit :people="peopleData" />
@@ -11,7 +15,7 @@
         <chat
           :userName="userName"
           :userNameId="userNameId"
-          :chatNameOrig="chatName"
+          :chatSide="chatSide"
         />
       </div>
     </div>
@@ -34,30 +38,42 @@ export default {
     let isEditing = ref(false)
     let userName = ref('')
     let userNameId = ref(0)
+    let user: any = ref([])
+    let isLoaded = ref(false)
     const sidebarData: any = ref([])
-    const chatName: any = ref('')
+    const favoriteData: any = ref([])
+    const myFavorites: any = ref([])
+    const chatSide: any = ref([])
 
     const FetchUsersData = async () => {
-      peopleData.value = []
-      sidebarData.value = []
-
       const response: any = await axios.get('../people.json')
-      peopleData.value = response.data
 
-      GetSidebarData(peopleData.value)
+      if (response.status === 200) {
+        peopleData.value = response.data
 
-      userNameId.value = parseInt(
-        peopleData.value.find((x: any) => x.active === true).id
-      )
-      userName.value = peopleData.value.find(
-        (x: any) => x.active === true
-      ).displayName
+        GetSidebarData(peopleData.value)
+        GetFavoriteData(peopleData.value)
+        GetUserData(peopleData.value)
+
+        isLoaded.value = true
+      }
     }
 
     const GetSidebarData = (originalData: any) => {
       sidebarData.value = originalData.filter((x: any) => x.active === false)
 
-      GetChatName(sidebarData.value)
+      GetFirstChat(sidebarData.value)
+    }
+
+    const GetUserData = (originalData: any) => {
+      user.value = originalData.find((x: any) => x.active === true)
+      userNameId.value = parseInt(user.value.id)
+      userName.value = user.value.displayName
+      myFavorites.value = user.value.myFavorites
+    }
+
+    const GetFavoriteData = (originalData: any) => {
+      favoriteData.value = originalData.filter((x: any) => x.id in favoriteData)
     }
 
     emitter.on('ShowEditComp', () => {
@@ -68,10 +84,9 @@ export default {
       isEditing.value = !isEditing.value
     }
 
-    const GetChatName = (sidebarData: any) => {
-      chatName.value = sidebarData.find(
-        (x: any) => x.active === false
-      ).displayName
+    const GetFirstChat = (originalData: any) => {
+      chatSide.value = originalData[0]
+      console.log(chatSide.value)
     }
 
     const UpdateUserData = (id: number) => {
@@ -120,9 +135,12 @@ export default {
       FetchUsersData,
       peopleData,
       sidebarData,
+      favoriteData,
       GetSidebarData,
-      GetChatName,
-      chatName,
+      GetFavoriteData,
+      chatSide,
+      isLoaded,
+      GetFirstChat,
     }
   },
 }

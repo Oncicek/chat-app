@@ -6,8 +6,7 @@
         <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
       </div>
       <div class="col-10">
-        <div>{{ props.userName }}</div>
-        <div>{{ props.lastMessage }}</div>
+        <div>{{ favoritePerson.displayName }}</div>
       </div>
     </div>
   </div>
@@ -18,12 +17,9 @@ import { reactive, onMounted, ref } from 'vue'
 
 export default {
   props: {
-    userName: {
-      type: String,
-    },
-    lastMessage: {
-      type: String,
-      required: false,
+    favoritePerson: {
+      type: Object,
+      required: true,
     },
   },
 

@@ -16,7 +16,11 @@
     </div>
     <div class="row"></div>
     <div class="row">
-      <favorites />
+      <favorites
+        v-for="favoritePerson in favoritePeople"
+        :key="favoritePerson.id"
+        :favoritePerson="favoritePerson"
+      />
     </div>
     <div class="row">
       <people
@@ -40,6 +44,10 @@ export default {
       type: Object,
       required: true,
     },
+    favoritePeople: {
+      type: Object,
+      required: true,
+    },
     userNameOrig: {
       type: String,
     },
@@ -48,8 +56,9 @@ export default {
   setup(props: any) {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
-    let userName = ref(props.userName)
+    const peopleSaved = ref(props.people)
 
+    let userName = ref(props.userName)
     let isLogged = ref('')
     let infoTab = ref('')
 
@@ -69,8 +78,6 @@ export default {
       }
     }
 
-    console.log(userName.value)
-
     onMounted(() => {})
 
     return {
@@ -81,6 +88,8 @@ export default {
       getChat,
       userName,
       SwitchHeader,
+      props,
+      peopleSaved,
     }
   },
 }

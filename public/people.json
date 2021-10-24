@@ -4,55 +4,66 @@
             "displayName": "Laszlo",
             "fullName": "Laszlo Komárom",
             "active": true,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": [
+                2,
+                3
+            ]
         },
         {
             "id": "1",
             "displayName": "Ildyko",
             "fullName": "ildyko Komárom",
             "active": false,
-            "favorite": false
+            "favorite": true,
+            "myFavorites": []
         },
         {
             "id": "2",
             "displayName": "Andrejka",
             "fullName": "Andrejka Dačo",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         },
         {
             "id": "3",
             "displayName": "Frantisek",
             "fullName": "František Stromokocůr",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         },
         {
             "id": "4",
             "displayName": "Zuzana",
             "fullName": "Zuzana Stromokocůrová",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         },
         {
             "id": "5",
             "displayName": "Marta",
             "fullName": "Marta Sladká",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         },
         {
             "id": "6",
             "displayName": "Milenka",
             "fullName": "Milka Stromokocůrová",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         },
         {
             "id": "7",
             "displayName": "Gergeli",
             "fullName": "Gergeli Komárom",
             "active": false,
-            "favorite": false
+            "favorite": false,
+            "myFavorites": []
         }
     ]

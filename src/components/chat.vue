@@ -1,7 +1,7 @@
 <template>
   <div class="container-flex">
     <div class="view chat">
-      <header>Conversation with {{ SwitchHeader() }}</header>
+      <header>Conversation with {{ state.chatName }}</header>
       <section class="chat-box">
         <div
           v-for="message in state.messages"
@@ -46,9 +46,8 @@ export default {
       type: Number,
       required: true,
     },
-    chatNameOrig: {
-      type: String,
-      required: true,
+    chatSide: {
+      type: Object,
     },
   },
   setup(props: any) {
@@ -57,15 +56,23 @@ export default {
     const conversationId = ref(0)
 
     let chatNameId: any = ref(0)
-    let userName = ref(props.userName)
-    let chatName = ref(props.chatName)
-    let userNameId = ref(props.userNameId)
+    let userName: any = ref('')
+    let chatName: any = ref('')
+    let userNameId: any = ref('')
 
     const state = reactive({
-      userNameId: userNameId.value,
+      chatName: chatName,
+      chatNameId: chatNameId,
+      userNameId: userNameId,
+      conversationId: conversationId,
       username: userName,
       messages: [],
     })
+
+    state.username = props.userName
+    state.userNameId = props.userNameId
+    state.chatName = props.chatSide['displayName']
+    state.chatNameId = props.chatSide['id']
 
     const SendMessage = () => {
       GetConversationId()
@@ -78,7 +85,7 @@ export default {
         username: state.username,
         content: inputMessage.value,
         timestamp: Date.now(),
-        conversationId: conversationId.value,
+        conversationId: state.conversationId,
       }
 
       messageRef.push(message)
@@ -86,24 +93,16 @@ export default {
     }
 
     const GetConversationId = () => {
-      conversationId.value =
-        parseInt(state.userNameId + 1) * (parseInt(chatNameId.value) + 1)
-    }
-
-    const SwitchHeader = () => {
-      if (!chatName.value) {
-        return props.chatNameOrig
-      } else {
-        return chatName.value
-      }
+      state.conversationId =
+        parseInt(state.userNameId + 1) * (parseInt(state.chatNameId) + 1)
     }
 
     emitter.on('getChat', (chat: any) => {
-      chatNameId.value = chat.id
-      chatName.value = chat.chatName
+      state.chatNameId = chat.id
+      state.chatName = chat.chatName
 
       GetConversationId()
-      GetFreshData(conversationId.value)
+      GetFreshData(state.conversationId)
     })
 
     const messageRef = db.database().ref('message')
@@ -131,7 +130,10 @@ export default {
       })
     }
 
-    onMounted(() => {})
+    onMounted(() => {
+      GetConversationId()
+      GetFreshData(state.conversationId)
+    })
 
     onUnmounted(() => {
       emitter.off('getChat')
@@ -142,11 +144,8 @@ export default {
       inputMessage,
       SendMessage,
       GetFreshData,
-      conversationId,
       props,
-      chatName,
       chatNameId,
-      SwitchHeader,
     }
   },
 }
