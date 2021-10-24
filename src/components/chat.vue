@@ -56,7 +56,7 @@ export default {
     const inputMessage = ref('')
     const conversationId = ref(0)
 
-    let chatNameId = ref(0)
+    let chatNameId: any = ref(0)
     let userName = ref(props.userName)
     let chatName = ref(props.chatName)
     let userNameId = ref(props.userNameId)
@@ -86,14 +86,8 @@ export default {
     }
 
     const GetConversationId = () => {
-      let chatId: number = chatNameId.value
-      conversationId.value = parseInt(state.userNameId) * chatId
-
-      console.log(
-        parseInt(state.userNameId),
-        chatId,
-        parseInt(state.userNameId) * chatId
-      )
+      conversationId.value =
+        parseInt(state.userNameId + 1) * (parseInt(chatNameId.value) + 1)
     }
 
     const SwitchHeader = () => {
@@ -103,6 +97,14 @@ export default {
         return chatName.value
       }
     }
+
+    emitter.on('getChat', (chat: any) => {
+      chatNameId.value = chat.id
+      chatName.value = chat.chatName
+
+      GetConversationId()
+      GetFreshData(conversationId.value)
+    })
 
     const messageRef = db.database().ref('message')
 
@@ -129,17 +131,11 @@ export default {
       })
     }
 
-    onMounted(() => {
-      emitter.on('getChat', (chat: any) => {
-        chatNameId.value = chat.id
-        chatName.value = chat.chatName
+    onMounted(() => {})
 
-        GetConversationId()
-        GetFreshData(conversationId.value)
-      })
+    onUnmounted(() => {
+      emitter.off('getChat')
     })
-
-    onUnmounted(() => {})
 
     return {
       state,

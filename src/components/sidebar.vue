@@ -80,6 +80,7 @@ export default {
       infoTab,
       getChat,
       userName,
+      SwitchHeader,
     }
   },
 }

@@ -23,7 +23,7 @@ import Sidebar from './components/sidebar.vue'
 import Conversations from './components/conversations.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
-import { reactive, onMounted, ref, inject } from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import axios from 'axios'
 
 export default {
@@ -38,6 +38,9 @@ export default {
     const chatName: any = ref('')
 
     const FetchUsersData = async () => {
+      peopleData.value = []
+      sidebarData.value = []
+
       const response: any = await axios.get('../people.json')
       peopleData.value = response.data
 
@@ -103,6 +106,10 @@ export default {
       emitter.on('updateUser', (id: number) => {
         UpdateUserData(id)
       })
+    })
+
+    onUnmounted(() => {
+      emitter.off('updateUser')
     })
 
     return {
