@@ -49,17 +49,28 @@ export default {
     let userFromFav = ref(-1)
 
     const FetchUsersData = async () => {
+      if (CachedData()) {
+        ShowData(peopleData.value)
+        isLoaded.value = true
+        return
+      }
+
       const response: any = await axios.get('../people.json')
 
       if (response.status === 200) {
         peopleData.value = response.data
+        localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
 
-        GetUserData(peopleData.value)
-        GetSidebarData(peopleData.value)
-        GetFavoriteData(peopleData.value)
+        ShowData(peopleData.value)
 
         isLoaded.value = true
       }
+    }
+
+    const ShowData = (data: any) => {
+      GetUserData(data)
+      GetSidebarData(data)
+      GetFavoriteData(data)
     }
 
     const state = reactive({
@@ -149,6 +160,18 @@ export default {
           console.log(x.myFavorites)
         }
       })
+
+      localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
+    }
+
+    const CachedData = () => {
+      if (localStorage.getItem('fakeApi')) {
+        peopleData.value = JSON.parse(localStorage.getItem('fakeApi')!) || []
+        return true
+      } else {
+        localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
+        return false
+      }
     }
 
     const UpdateUserData = (id: number) => {
@@ -216,6 +239,7 @@ export default {
       isLoaded,
       GetFirstChat,
       UpdateFavorites,
+      CachedData,
     }
   },
 }
