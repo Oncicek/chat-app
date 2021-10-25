@@ -1,7 +1,16 @@
 <template>
   <div class="container-flex">
+    <div class="row">
+      <div class="col">
+        <header>Conversation with {{ state.chatName }}</header>
+      </div>
+      <div class="col">
+        <button @click="AddToFavorites(state.userNameId, state.chatNameId)">
+          Favorite!
+        </button>
+      </div>
+    </div>
     <div class="view chat">
-      <header>Conversation with {{ state.chatName }}</header>
       <section class="chat-box">
         <div
           v-for="message in state.messages"
@@ -52,6 +61,7 @@ export default {
     const inputMessage = ref('')
     const conversationId = ref(0)
     let favoriteData: any = ref([])
+    let user: any = ref([])
 
     const state = reactive({
       chatName: props.chatSide['displayName'],
@@ -60,6 +70,7 @@ export default {
       conversationId: conversationId,
       username: props.user['displayName'],
       messages: [],
+      user: user,
     })
 
     const SendMessage = () => {
@@ -127,6 +138,10 @@ export default {
       }
     }
 
+    const AddToFavorites = (userId: number, chatId: number) => {
+      emitter.emit('addToFavorites', { userId, chatId })
+    }
+
     const GetFreshData = (conversationId: number) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
@@ -170,6 +185,7 @@ export default {
       props,
       CalcConvId,
       favoriteData,
+      AddToFavorites,
     }
   },
 }

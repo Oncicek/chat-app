@@ -27,24 +27,26 @@ import Sidebar from './components/sidebar.vue'
 import Conversations from './components/conversations.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
-import Dialog from './components/dialog.vue'
 import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import axios from 'axios'
 
 export default {
-  components: { Chat, Sidebar, Conversations, Edit, Dialog },
+  components: { Chat, Sidebar, Conversations, Edit },
   setup() {
     const emitter: any = inject('emitter')
     const peopleData: any = ref([])
     let isEditing = ref(false)
     let userName = ref('')
     let userNameId = ref(0)
+    let myFavoriteManuallyAdded = ref(-1)
     const user: any = ref([])
     let isLoaded = ref(false)
     const sidebarData: any = ref([])
     const favoriteData: any = ref([])
-    const myFavorites: any = ref([])
+    let userFavorite: any = ref([])
+    let manAdded: any = ref([])
     const chatSide: any = ref([])
+    let userFromFav = ref(-1)
 
     const FetchUsersData = async () => {
       const response: any = await axios.get('../people.json')
@@ -52,13 +54,18 @@ export default {
       if (response.status === 200) {
         peopleData.value = response.data
 
-        GetSidebarData(peopleData.value)
         GetUserData(peopleData.value)
+        GetSidebarData(peopleData.value)
         GetFavoriteData(peopleData.value)
 
         isLoaded.value = true
       }
     }
+
+    const state = reactive({
+      manAdded: manAdded.value,
+      userFromFav: userFromFav.value,
+    })
 
     const GetSidebarData = (originalData: any) => {
       sidebarData.value = originalData.filter((x: any) => x.active === false)
@@ -71,18 +78,32 @@ export default {
 
       userNameId.value = parseInt(user.value.id)
       userName.value = user.value.displayName
-      myFavorites.value = user.value.myFavorites
     }
 
     const GetFavoriteData = (originalData: any) => {
-      favoriteData.value = []
-      let userFavorite: [] = user.value['myFavorites']
+      console.log('kockasodkc: ', state.userFromFav)
+      originalData.forEach((x: any) => {
+        if (x.id === state.userFromFav) {
+          for (let i = 0; i < state.manAdded.length; i++) {
+            if (x.myFavorites.indexOf(parseInt(state.manAdded[i])) === -1) {
+              x.myFavorites.push(parseInt(state.manAdded[i]))
+            }
+          }
+        }
+      })
 
-      userFavorite.forEach((x: number) => {
+      favoriteData.value = []
+      userFavorite.value = user.value['myFavorites']
+
+      userFavorite.value.forEach((x: number) => {
         favoriteData.value.push(
           originalData.find((y: any) => parseInt(y.id) === x)
         )
       })
+
+      console.log('manAdded: ', state.manAdded)
+      console.log('userFavorite: ', userFavorite.value)
+      console.log('favoriteData: ', favoriteData.value)
     }
 
     emitter.on('ShowEditComp', (isFromRow: boolean) => {
@@ -137,12 +158,20 @@ export default {
       FetchUsersData()
 
       emitter.on('updateUser', (id: number) => {
+        state.manAdded = []
         UpdateUserData(id)
+      })
+
+      emitter.on('addToFavorites', (params: any) => {
+        state.manAdded.push(params.chatId)
+        state.userFromFav = params.userId
+        UpdateUserData(params.userId)
       })
     })
 
     onUnmounted(() => {
       emitter.off('updateUser')
+      emitter.off('addToFavorites')
     })
 
     return {
@@ -157,7 +186,10 @@ export default {
       GetSidebarData,
       GetFavoriteData,
       chatSide,
+      userFavorite,
+      myFavoriteManuallyAdded,
       user,
+      state,
       isLoaded,
       GetFirstChat,
     }

@@ -4,7 +4,6 @@
             "displayName": "Laszlo",
             "fullName": "Laszlo Komárom",
             "active": true,
-            "favorite": false,
             "myFavorites": [
                 2,
                 3
@@ -15,7 +14,6 @@
             "displayName": "Ildyko",
             "fullName": "ildyko Komárom",
             "active": false,
-            "favorite": true,
             "myFavorites": [
                 4
             ]
@@ -25,7 +23,6 @@
             "displayName": "Andrejka",
             "fullName": "Andrejka Dačo",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         },
         {
@@ -33,7 +30,6 @@
             "displayName": "Frantisek",
             "fullName": "František Stromokocůr",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         },
         {
@@ -41,7 +37,6 @@
             "displayName": "Zuzana",
             "fullName": "Zuzana Stromokocůrová",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         },
         {
@@ -49,7 +44,6 @@
             "displayName": "Marta",
             "fullName": "Marta Sladká",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         },
         {
@@ -57,7 +51,6 @@
             "displayName": "Milenka",
             "fullName": "Milka Stromokocůrová",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         },
         {
@@ -65,7 +58,6 @@
             "displayName": "Gergeli",
             "fullName": "Gergeli Komárom",
             "active": false,
-            "favorite": false,
             "myFavorites": []
         }
     ]

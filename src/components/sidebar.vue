@@ -24,6 +24,10 @@
         v-for="favoritePerson in favoritePeople"
         :key="favoritePerson.id"
         :favoritePerson="favoritePerson"
+        @click="
+          ShowEditComp(true),
+            getChat(favoritePerson.id, favoritePerson.displayName)
+        "
       />
     </div>
     <div class="row">
