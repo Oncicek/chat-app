@@ -81,7 +81,6 @@ export default {
     }
 
     const GetFavoriteData = (originalData: any) => {
-      console.log('kockasodkc: ', state.userFromFav)
       originalData.forEach((x: any) => {
         if (x.id === state.userFromFav) {
           for (let i = 0; i < state.manAdded.length; i++) {
@@ -126,6 +125,32 @@ export default {
       chatSide.value = originalData[0]
     }
 
+    const UpdateFavorites = (params: any) => {
+      let chatId = parseInt(params.chatId)
+      let userId = parseInt(params.userId)
+
+      peopleData.value.forEach((x: any) => {
+        if (parseInt(x.id) === userId) {
+          let indexInFavs = x.myFavorites.indexOf(chatId)
+          let indexInPeople = favoriteData.value.findIndex(
+            (y: any) => parseInt(y.id) == chatId
+          )
+          if (parseInt(indexInFavs) === -1) {
+            x.myFavorites.push(chatId)
+            favoriteData.value.push(
+              peopleData.value.find(
+                (person: any) => parseInt(person.id) == chatId
+              )
+            )
+          } else {
+            x.myFavorites.splice(indexInFavs, 1)
+            favoriteData.value.splice(indexInPeople, 1)
+          }
+          console.log(x.myFavorites)
+        }
+      })
+    }
+
     const UpdateUserData = (id: number) => {
       peopleData.value.forEach((x: any) => {
         if (x.id == id) {
@@ -163,9 +188,7 @@ export default {
       })
 
       emitter.on('addToFavorites', (params: any) => {
-        state.manAdded.push(params.chatId)
-        state.userFromFav = params.userId
-        UpdateUserData(params.userId)
+        UpdateFavorites(params)
       })
     })
 
@@ -192,6 +215,7 @@ export default {
       state,
       isLoaded,
       GetFirstChat,
+      UpdateFavorites,
     }
   },
 }

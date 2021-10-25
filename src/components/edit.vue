@@ -38,7 +38,7 @@
         <p>Active user</p>
       </div>
       <div class="col">
-        <select v-model="selectedUser" @click="updateUser">
+        <select v-model="selectedUser" @change="updateUser">
           <option v-for="person in people" :key="person.id" :value="person.id">
             {{ person.displayName }}
           </option>

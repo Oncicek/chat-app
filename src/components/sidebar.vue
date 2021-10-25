@@ -21,6 +21,7 @@
     <div class="row">
       <header>Favorites</header>
       <favorites
+        class="favoriteTab"
         v-for="favoritePerson in favoritePeople"
         :key="favoritePerson.id"
         :favoritePerson="favoritePerson"
@@ -32,6 +33,7 @@
     </div>
     <div class="row">
       <people
+        class="peopleTab"
         v-for="person in people"
         :key="person.id"
         :person="person"
@@ -102,4 +104,12 @@ export default {
   },
 }
 </script>
-<style scoped lang="scss"></style>
+<style scoped lang="scss">
+.peopleTab:hover {
+  background-color: aqua;
+}
+
+.favoriteTab:hover {
+  background-color: green;
+}
+</style>

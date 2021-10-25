@@ -6,7 +6,7 @@
       </div>
       <div class="col">
         <button @click="AddToFavorites(state.userNameId, state.chatNameId)">
-          Favorite!
+          {{ state.favBtnText }}
         </button>
       </div>
     </div>
@@ -62,6 +62,7 @@ export default {
     const conversationId = ref(0)
     let favoriteData: any = ref([])
     let user: any = ref([])
+    let favBtnText = ref('')
 
     const state = reactive({
       chatName: props.chatSide['displayName'],
@@ -69,6 +70,8 @@ export default {
       userNameId: props.user['id'],
       conversationId: conversationId,
       username: props.user['displayName'],
+      favBtnText: favBtnText,
+      favPeople: props.favoritePeople,
       messages: [],
       user: user,
     })
@@ -142,6 +145,20 @@ export default {
       emitter.emit('addToFavorites', { userId, chatId })
     }
 
+    const GetFavBtnText = () => {
+      Object.values(state.favPeople).forEach((x: any) => {})
+
+      let isFaved = Object.values(state.favPeople).findIndex(
+        (x: any) => x.id === state.chatNameId
+      )
+
+      if (isFaved > -1) {
+        favBtnText.value = 'UNfavorite!'
+      } else {
+        favBtnText.value = 'Favorite!'
+      }
+    }
+
     const GetFreshData = (conversationId: number) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
@@ -164,6 +181,7 @@ export default {
 
         GetFavoriteMessage(props.favoritePeople, messages)
 
+        GetFavBtnText()
         state.messages = clearedMsg
       })
     }
@@ -186,6 +204,7 @@ export default {
       CalcConvId,
       favoriteData,
       AddToFavorites,
+      GetFavBtnText,
     }
   },
 }
