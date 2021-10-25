@@ -2,7 +2,7 @@
   <div>
     <table>
       <tbody>
-        <tr @click="getChat">
+        <tr>
           <td>
             <i
               class="bi-circle"
@@ -11,6 +11,17 @@
           </td>
           <td class="align-middle displayName">
             {{ person.displayName }}
+          </td>
+          <td>
+            <select
+              name="peopleDD"
+              @click="peopleBtn($event)"
+              class="form-select form-control"
+            >
+              <option>...</option>
+              <option value="0">Add to Favorites</option>
+              <option value="1">Remove from People</option>
+            </select>
           </td>
         </tr>
       </tbody>
@@ -27,15 +38,28 @@ export default {
       type: Object,
       required: true,
     },
-    lastMessage: {
-      type: String,
-      required: false,
-    },
   },
 
   setup(props: any) {
+    const emitter: any = inject('emitter')
+
+    const state = reactive({
+      userId: props.person['id'],
+    })
+
+    const peopleBtn = (event: any) => {
+      if (event.target.value == 0) {
+        emitter.emit('favFromPeople', state.userId)
+      } else {
+        emitter.emit('destroyFromPeople', state.userId)
+      }
+      console.log(event.target.value)
+    }
+
     return {
       props,
+      peopleBtn,
+      state,
     }
   },
 }

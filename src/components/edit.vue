@@ -43,6 +43,7 @@
             {{ person.displayName }}
           </option>
         </select>
+        <button @click="resetConfig">Reset Config</button>
       </div>
     </div>
   </div>
@@ -79,6 +80,10 @@ export default {
       state.showModal
     }
 
+    const resetConfig = () => {
+      emitter.emit('resetConfig')
+    }
+
     onMounted(() => {
       state.showModal = false
       findActive()
@@ -90,6 +95,7 @@ export default {
       findActive,
       updateUser,
       state,
+      resetConfig,
     }
   },
 }

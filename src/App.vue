@@ -48,8 +48,8 @@ export default {
     const chatSide: any = ref([])
     let userFromFav = ref(-1)
 
-    const FetchUsersData = async () => {
-      if (CachedData()) {
+    const FetchUsersData = async (forceFetch: boolean = false) => {
+      if (CachedData() && !forceFetch) {
         ShowData(peopleData.value)
         isLoaded.value = true
         return
@@ -136,9 +136,8 @@ export default {
       chatSide.value = originalData[0]
     }
 
-    const UpdateFavorites = (params: any) => {
-      let chatId = parseInt(params.chatId)
-      let userId = parseInt(params.userId)
+    const UpdateFavorites = (chatId: number) => {
+      let userId = userNameId.value
 
       peopleData.value.forEach((x: any) => {
         if (parseInt(x.id) === userId) {
@@ -167,11 +166,19 @@ export default {
     const CachedData = () => {
       if (localStorage.getItem('fakeApi')) {
         peopleData.value = JSON.parse(localStorage.getItem('fakeApi')!) || []
-        return true
+        return true //set false for debug
       } else {
         localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
         return false
       }
+    }
+
+    const DestroyPerson = (fromId: number) => {
+      let index: number = peopleData.value.findIndex(
+        (person: any) => parseInt(person.id) == fromId
+      )
+      // peopleData.value.splice(index, 1)
+      // UpdateUserData(userNameId.value)
     }
 
     const UpdateUserData = (id: number) => {
@@ -210,14 +217,29 @@ export default {
         UpdateUserData(id)
       })
 
-      emitter.on('addToFavorites', (params: any) => {
-        UpdateFavorites(params)
+      emitter.on('favFromPeople', (fromId: number) => {
+        UpdateFavorites(fromId)
+      })
+
+      emitter.on('destroyFromPeople', (fromId: number) => {
+        DestroyPerson(fromId)
+      })
+
+      emitter.on('resetConfig', () => {
+        FetchUsersData(true)
+      })
+
+      emitter.on('addToFavorites', (chatId: number) => {
+        UpdateFavorites(chatId)
       })
     })
 
     onUnmounted(() => {
       emitter.off('updateUser')
       emitter.off('addToFavorites')
+      emitter.off('destroyFromPeople')
+      emitter.off('favFromPeople')
+      emitter.off('resetConfig')
     })
 
     return {
@@ -240,6 +262,7 @@ export default {
       GetFirstChat,
       UpdateFavorites,
       CachedData,
+      DestroyPerson,
     }
   },
 }

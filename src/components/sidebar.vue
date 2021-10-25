@@ -67,6 +67,7 @@ export default {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
     const peopleSaved = ref(props.people)
+    const favIds = ref([])
 
     let userName = ref(props.userName)
     let isLogged = ref('')

@@ -5,7 +5,7 @@
         <header>Conversation with {{ state.chatName }}</header>
       </div>
       <div class="col">
-        <button @click="AddToFavorites(state.userNameId, state.chatNameId)">
+        <button @click="AddToFavorites(state.chatNameId)">
           {{ state.favBtnText }}
         </button>
       </div>
@@ -141,13 +141,11 @@ export default {
       }
     }
 
-    const AddToFavorites = (userId: number, chatId: number) => {
-      emitter.emit('addToFavorites', { userId, chatId })
+    const AddToFavorites = (chatId: number) => {
+      emitter.emit('addToFavorites', chatId)
     }
 
     const GetFavBtnText = () => {
-      Object.values(state.favPeople).forEach((x: any) => {})
-
       let isFaved = Object.values(state.favPeople).findIndex(
         (x: any) => x.id === state.chatNameId
       )
