@@ -1,16 +1,17 @@
 <template>
-  <div class="container-flex">
-    <div class="row">
-      <div class="col">
-        <header>Conversation with {{ state.chatName }}</header>
-      </div>
-      <div class="col">
-        <button @click="AddToFavorites(state.chatNameId)">
-          {{ state.favBtnText }}
-        </button>
-      </div>
-    </div>
+  <div class="container-flex chat-app">
     <div class="view chat">
+      <div class="row chat-header">
+        <div class="col-11 conv-name">
+          <header>Conversation with {{ state.chatName }}</header>
+        </div>
+        <div class="col-1 fav-button">
+          <button @click="AddToFavorites(state.chatNameId)" id="fav-btn">
+            <i v-if="state.isFavedBtn" class="bi-star"></i>
+            <i v-else class="bi-star-fill" style="color: blue"></i>
+          </button>
+        </div>
+      </div>
       <section class="chat-box">
         <div
           v-for="message in state.messages"
@@ -31,10 +32,16 @@
         </div>
       </section>
       <footer>
-        <form @submit.prevent="SendMessage">
-          <input type="text" v-model="inputMessage" placeholder="write a msg" />
-          <input type="submit" value="Send" />
-        </form>
+        <div class="input-wrapper">
+          <form @submit.prevent="SendMessage">
+            <input
+              type="text"
+              v-model="inputMessage"
+              :placeholder="'Message ' + state.chatName"
+            />
+            <input type="submit" value="Send" class="submit-btn" />
+          </form>
+        </div>
       </footer>
     </div>
   </div>
@@ -62,7 +69,7 @@ export default {
     const conversationId = ref(0)
     let favoriteData: any = ref([])
     let user: any = ref([])
-    let favBtnText = ref('')
+    let isFavedBtn = ref(false)
 
     const state = reactive({
       chatName: props.chatSide['displayName'],
@@ -70,7 +77,7 @@ export default {
       userNameId: props.user['id'],
       conversationId: conversationId,
       username: props.user['displayName'],
-      favBtnText: favBtnText,
+      isFavedBtn: isFavedBtn,
       favPeople: props.favoritePeople,
       messages: [],
       user: user,
@@ -145,15 +152,15 @@ export default {
       emitter.emit('addToFavorites', chatId)
     }
 
-    const GetFavBtnText = () => {
+    const GetisFavedBtn = () => {
       let isFaved = Object.values(state.favPeople).findIndex(
         (x: any) => x.id === state.chatNameId
       )
 
       if (isFaved > -1) {
-        favBtnText.value = 'UNfavorite!'
+        state.isFavedBtn = false
       } else {
-        favBtnText.value = 'Favorite!'
+        state.isFavedBtn = true
       }
     }
 
@@ -177,9 +184,10 @@ export default {
           (x: any) => x.conversationId === conversationId
         )
 
-        GetFavoriteMessage(props.favoritePeople, messages)
+        clearedMsg.reverse()
 
-        GetFavBtnText()
+        GetFavoriteMessage(props.favoritePeople, messages)
+        GetisFavedBtn()
         state.messages = clearedMsg
       })
     }
@@ -202,123 +210,68 @@ export default {
       CalcConvId,
       favoriteData,
       AddToFavorites,
-      GetFavBtnText,
+      GetisFavedBtn,
     }
   },
 }
 </script>
 
 <style scoped lang="scss">
+#fav-btn {
+  border: 0px;
+  background-color: white;
+}
+
+.submit-btn {
+  font-size: 15px !important;
+  margin-right: 10px;
+  border-radius: 100px;
+  border: 1px solid lightgray;
+}
+
+.chat-header {
+  padding: 5px !important;
+  --bs-gutter-x: 0 !important;
+  padding: 0px 10px;
+  background-color: white;
+  font-size: 15px;
+}
+
+.fav-button {
+  text-align: right;
+  align-content: right;
+}
+
+.conv-name {
+  text-align: center;
+}
+
+.input-wrapper {
+  border: 1px solid gray;
+  border-radius: 20px;
+}
+
 .view {
   display: flex;
   justify-content: center;
-  min-height: 100vh;
-  background-color: #aaa;
-
+  max-height: 100vh;
   &.login {
     align-items: center;
     .login-form {
       display: block;
       width: 100%;
       padding: 15px;
-
-      .form-inner {
-        display: block;
-        background-color: #fff;
-        padding: 50px 15px;
-        border-radius: 16px;
-        box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.2);
-        h1 {
-          color: #aaa;
-          font-size: 28px;
-          margin-bottom: 30px;
-        }
-        label {
-          display: block;
-          margin-bottom: 5px;
-          color: #aaa;
-          font-size: 16px;
-          transition: 0.4s;
-        }
-        input[type='text'] {
-          appearance: none;
-          border: none;
-          outline: none;
-          background: none;
-          display: block;
-          width: 100%;
-          padding: 10px 15px;
-          border-radius: 8px;
-          margin-bottom: 15px;
-
-          color: #333;
-          font-size: 18px;
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
-          background-color: #f3f3f3;
-          transition: 0.4s;
-          &::placeholder {
-            color: #888;
-            transition: 0.4s;
-          }
-        }
-        input[type='submit'] {
-          appearance: none;
-          border: none;
-          outline: none;
-          background: none;
-          display: block;
-          width: 100%;
-          padding: 10px 15px;
-          background-color: #ea526f;
-          border-radius: 8px;
-          color: #fff;
-          font-size: 18px;
-          font-weight: 700;
-        }
-        &:focus-within {
-          label {
-            color: #ea526f;
-          }
-          input[type='text'] {
-            background-color: #fff;
-            box-shadow: 0 0 6px rgba(0, 0, 0, 0.2);
-            &::placeholder {
-              color: #666;
-            }
-          }
-        }
-      }
     }
   }
   &.chat {
     flex-direction: column;
-    header {
-      position: relative;
-      display: block;
-      width: 100%;
-      padding: 50px 30px 10px;
-      .logout {
-        position: absolute;
-        top: 15px;
-        right: 15px;
-        appearance: none;
-        border: none;
-        outline: none;
-        background: none;
-
-        color: #fff;
-        font-size: 18px;
-        margin-bottom: 10px;
-        text-align: right;
-      }
-      h1 {
-        color: #fff;
-      }
-    }
+    padding-bottom: 1.5vh;
     .chat-box {
-      max-height: 80vh;
+      flex-direction: column-reverse;
+      display: flex;
+      max-height: 90vh;
+      min-height: 90vh;
       overflow-y: scroll;
-      border-radius: 24px 24px 0px 0px;
       background-color: #fff;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
       flex: 1 1 100%;
@@ -330,32 +283,31 @@ export default {
         .message-inner {
           .username {
             color: #888;
-            font-size: 16px;
+            font-size: 12px;
             margin-bottom: 5px;
-            padding-left: 15px;
-            padding-right: 15px;
+            padding-left: 5px;
+            padding-right: 5px;
           }
           .content {
             display: inline-block;
             padding: 10px 20px;
-            background-color: #f3f3f3;
-            border-radius: 999px;
-            color: #333;
-            font-size: 18px;
-            line-height: 1.2em;
+            background-color: dodgerblue;
+            border-radius: 50px;
+            color: #fff;
+            font-size: 15px;
+            line-height: 1em;
             text-align: left;
           }
         }
         &.current-user {
-          margin-top: 30px;
+          margin-top: 10px;
           justify-content: flex-end;
           text-align: right;
           .message-inner {
             max-width: 75%;
             .content {
-              color: #fff;
-              font-weight: 600;
-              background-color: #ea526f;
+              color: black;
+              background-color: lightgray;
             }
           }
         }
@@ -364,44 +316,27 @@ export default {
     footer {
       position: sticky;
       bottom: 0px;
-      background-color: #fff;
-      padding: 30px;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
       form {
         display: flex;
         input[type='text'] {
+          border: 0px;
+          border-radius: 20px;
           flex: 1 1 100%;
-          appearance: none;
-          border: none;
-          outline: none;
-          background: none;
-          display: block;
           width: 100%;
-          padding: 10px 15px;
-          border-radius: 8px 0px 0px 8px;
-
-          color: #333;
+          padding: 5px 10px 1px 10px;
+          margin: 0px 2px 5px 2px;
           font-size: 18px;
-          box-shadow: 0px 0px 0px rgba(0, 0, 0, 0);
-          background-color: #f3f3f3;
-          transition: 0.4s;
           &::placeholder {
-            color: #888;
-            transition: 0.4s;
+            color: black;
           }
         }
 
         input[type='submit'] {
-          appearance: none;
-          border: none;
-          outline: none;
-          background: none;
           display: block;
-          padding: 10px 15px;
-          border-radius: 0px 8px 8px 0px;
-          background-color: #ea526f;
+          background-color: lightgray;
           color: #fff;
-          font-size: 18px;
+          font-size: 15px;
           font-weight: 700;
         }
       }

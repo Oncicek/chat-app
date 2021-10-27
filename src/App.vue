@@ -1,7 +1,7 @@
 <template>
-  <div class="container" v-if="isLoaded">
+  <div class="container main-container" v-if="isLoaded">
     <div class="row">
-      <div class="col sidebarTheme">
+      <div class="col sidebar-theme">
         <sidebar
           :people="sidebarData"
           :userNameOrig="userName"
@@ -11,7 +11,7 @@
       <div class="col" v-if="isEditing">
         <edit :people="peopleData" />
       </div>
-      <div class="col" v-if="!isEditing && userNameId > -1">
+      <div class="col chat-theme" v-if="!isEditing && userNameId > -1">
         <chat
           :user="user"
           :chatSide="chatSide"
@@ -166,7 +166,7 @@ export default {
     const CachedData = () => {
       if (localStorage.getItem('fakeApi')) {
         peopleData.value = JSON.parse(localStorage.getItem('fakeApi')!) || []
-        return true //set false for debug
+        return false //set false for debug
       } else {
         localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
         return false
@@ -278,7 +278,18 @@ export default {
   box-sizing: border-box;
 }
 
-.sidebarTheme {
+.main-container {
+  border: 1px solid lightgray;
+  box-shadow: 5px 5px 10px 1px rgba(100, 100, 100, 100);
+  border-radius: 10px 10px 10px 10px;
+  margin: 0px 20px 0px 20px;
+}
+
+.sidebar-theme {
   background-color: lavenderblush;
+}
+
+.chat-theme {
+  padding: 0px !important;
 }
 </style>
