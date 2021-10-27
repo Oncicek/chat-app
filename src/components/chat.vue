@@ -8,7 +8,7 @@
         <div class="col-1 fav-button">
           <button @click="AddToFavorites(state.chatNameId)" id="fav-btn">
             <i v-if="state.isFavedBtn" class="bi-star"></i>
-            <i v-else class="bi-star-fill" style="color: blue"></i>
+            <i v-else class="bi-star-fill"></i>
           </button>
         </div>
       </div>
@@ -24,9 +24,7 @@
         >
           <div class="message-inner">
             <div class="username">{{ message.username }}</div>
-            <div class="username">
-              {{ message.timestamp }}
-            </div>
+            <div class="username"></div>
             <div class="content">{{ message.content }}</div>
           </div>
         </div>
@@ -39,7 +37,9 @@
               v-model="inputMessage"
               :placeholder="'Message ' + state.chatName"
             />
-            <input type="submit" value="Send" class="submit-btn" />
+            <button type="submit" class="submit-btn">
+              <i class="bi-arrow-up-circle-fill" style="color: lightgray"></i>
+            </button>
           </form>
         </div>
       </footer>
@@ -77,7 +77,7 @@ export default {
       userNameId: props.user['id'],
       conversationId: conversationId,
       username: props.user['displayName'],
-      isFavedBtn: isFavedBtn,
+      isFavedBtn: isFavedBtn.value,
       favPeople: props.favoritePeople,
       messages: [],
       user: user,
@@ -193,6 +193,7 @@ export default {
     }
 
     onMounted(() => {
+      GetisFavedBtn()
       GetConversationId()
       GetFreshData(state.conversationId)
     })
@@ -223,18 +224,20 @@ export default {
 }
 
 .submit-btn {
-  font-size: 15px !important;
-  margin-right: 10px;
+  background-color: white;
+  border: 0px;
   border-radius: 100px;
-  border: 1px solid lightgray;
+  font-size: 25px !important;
+  margin-right: 10px;
 }
 
 .chat-header {
-  padding: 5px !important;
+  padding: 15px !important;
   --bs-gutter-x: 0 !important;
   padding: 0px 10px;
   background-color: white;
   font-size: 15px;
+  border-radius: 0px 20px 0px 0px;
 }
 
 .fav-button {
@@ -265,12 +268,12 @@ export default {
   }
   &.chat {
     flex-direction: column;
-    padding-bottom: 1.5vh;
+    padding-bottom: 4vh;
     .chat-box {
       flex-direction: column-reverse;
       display: flex;
-      max-height: 90vh;
-      min-height: 90vh;
+      max-height: 80vh;
+      min-height: 80vh;
       overflow-y: scroll;
       background-color: #fff;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
@@ -289,6 +292,7 @@ export default {
             padding-right: 5px;
           }
           .content {
+            word-break: break-word;
             display: inline-block;
             padding: 10px 20px;
             background-color: dodgerblue;
@@ -317,6 +321,7 @@ export default {
       position: sticky;
       bottom: 0px;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
+      padding: 0px 20px;
       form {
         display: flex;
         input[type='text'] {
@@ -326,10 +331,14 @@ export default {
           width: 100%;
           padding: 5px 10px 1px 10px;
           margin: 0px 2px 5px 2px;
-          font-size: 18px;
+          font-size: 15px;
+          font-weight: 100;
           &::placeholder {
-            color: black;
+            color: darkgray;
           }
+        }
+        input:focus {
+          outline: none;
         }
 
         input[type='submit'] {

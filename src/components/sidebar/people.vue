@@ -4,24 +4,12 @@
       <tbody>
         <tr>
           <td>
-            <i
-              class="bi-circle"
-              style="font-size: 2rem; color: cornflowerblue"
-            ></i>
+            <div class="circle">
+              {{ personInfo.nameInitials }}
+            </div>
           </td>
           <td class="align-middle displayName">
             {{ person.displayName }}
-          </td>
-          <td>
-            <select
-              name="peopleDD"
-              @click="peopleBtn($event)"
-              class="form-select form-control"
-            >
-              <option>...</option>
-              <option value="0">Add to Favorites</option>
-              <option value="1">Remove from People</option>
-            </select>
           </td>
         </tr>
       </tbody>
@@ -42,10 +30,20 @@ export default {
 
   setup(props: any) {
     const emitter: any = inject('emitter')
+    let nameInitials = ref(props.person.fullName)
+
+    const personInfo = reactive({
+      nameInitials: nameInitials.value,
+    })
 
     const state = reactive({
       userId: props.person['id'],
     })
+
+    const GetNameInitials = (fullName: string) => {
+      let name = fullName.split(' ')
+      personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
+    }
 
     const peopleBtn = (event: any) => {
       if (event.target.value == 0) {
@@ -56,10 +54,18 @@ export default {
       console.log(event.target.value)
     }
 
+    onMounted(() => {
+      GetNameInitials(personInfo.nameInitials)
+      console.log(personInfo.nameInitials)
+    })
+
     return {
       props,
       peopleBtn,
       state,
+      personInfo,
+      nameInitials,
+      GetNameInitials,
     }
   },
 }
@@ -68,5 +74,19 @@ export default {
 <style lang="scss" scoped>
 .displayName {
   padding-left: 10px;
+}
+
+.circle {
+  width: 30px;
+  height: 30px;
+  border-radius: 250px;
+  font-size: 13px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  background: lightgray;
+  border: 0px;
+  float: right;
+  padding-top: 20%;
 }
 </style>

@@ -2,7 +2,10 @@
   <div class="container">
     <div class="row">
       <div class="col-1">
-        <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i>
+        <div class="circle">
+          {{ personInfo.nameInitials }}
+        </div>
+        <!-- <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i> -->
       </div>
       <div class="col-10">
         <div>{{ favoritePerson.displayName }}</div>
@@ -27,14 +30,25 @@ export default {
     const emitter: any = inject('emitter')
     let favouriteData: any = ref([])
     let lastMessage: any = ref('')
+    let nameInitials = ref(props.favoritePerson.fullName)
 
+    const personInfo = reactive({
+      nameInitials: nameInitials.value,
+    })
     const state = reactive({
       favoritePerson: props.favoritePerson['displayName'],
       favouriteData: favouriteData,
       lastMessage: lastMessage,
     })
 
+    const GetNameInitials = (fullName: string) => {
+      let name = fullName.split(' ')
+      personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
+    }
+
     onMounted(() => {
+      GetNameInitials(personInfo.nameInitials)
+
       emitter.on('favMessage', (favMessage: any) => {
         state.favouriteData =
           favMessage.find(
@@ -55,9 +69,25 @@ export default {
     return {
       props,
       state,
+      personInfo,
+      nameInitials,
+      GetNameInitials,
     }
   },
 }
 </script>
 
-<style lang="scss" scoped></style>
+<style lang="scss" scoped>
+.circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 250px;
+  font-size: 15px;
+  color: black;
+  font-weight: bold;
+  text-align: center;
+  background: lightgray;
+  border: 0px;
+  padding-top: 35%;
+}
+</style>

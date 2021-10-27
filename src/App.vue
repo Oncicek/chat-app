@@ -4,7 +4,7 @@
       <div class="col sidebar-theme">
         <sidebar
           :people="sidebarData"
-          :userNameOrig="userName"
+          :userNameOrig="userFullname"
           :favoritePeople="favoriteData"
         />
       </div>
@@ -37,6 +37,7 @@ export default {
     const peopleData: any = ref([])
     let isEditing = ref(false)
     let userName = ref('')
+    let userFullname = ref('')
     let userNameId = ref(0)
     let myFavoriteManuallyAdded = ref(-1)
     const user: any = ref([])
@@ -89,6 +90,7 @@ export default {
 
       userNameId.value = parseInt(user.value.id)
       userName.value = user.value.displayName
+      userFullname.value = user.value.fullName
     }
 
     const GetFavoriteData = (originalData: any) => {
@@ -206,6 +208,10 @@ export default {
         userName.value = peopleData.value.find(
           (x: any) => x.active === true
         )?.displayName
+
+        userFullname.value = peopleData.value.find(
+          (x: any) => x.active === true
+        )?.fullName
       }
     }
 
@@ -263,6 +269,7 @@ export default {
       UpdateFavorites,
       CachedData,
       DestroyPerson,
+      userFullname,
     }
   },
 }
@@ -281,15 +288,19 @@ export default {
 .main-container {
   border: 1px solid lightgray;
   box-shadow: 5px 5px 10px 1px rgba(100, 100, 100, 100);
-  border-radius: 10px 10px 10px 10px;
-  margin: 0px 20px 0px 20px;
+  border-radius: 20px;
+  margin: 20px 20px 0px 20px;
+  max-width: 120vh !important;
 }
 
 .sidebar-theme {
-  background-color: lavenderblush;
+  background-color: #f8eff1;
+  border-radius: 20px 0px 0px 20px;
+  min-height: 95vh;
 }
 
 .chat-theme {
   padding: 0px !important;
+  border-radius: 0px 20px 20px 0px;
 }
 </style>
