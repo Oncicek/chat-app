@@ -8,7 +8,7 @@
         <div class="col-1 fav-button">
           <button @click="AddToFavorites(state.chatNameId)" id="fav-btn">
             <i v-if="state.isFavedBtn" class="bi-star"></i>
-            <i v-else class="bi-star-fill"></i>
+            <i v-else class="bi-star-fill" style="color: blue"></i>
           </button>
         </div>
       </div>

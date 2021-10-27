@@ -81,10 +81,10 @@ export default {
   height: 30px;
   border-radius: 250px;
   font-size: 13px;
-  color: black;
+  color: white;
   font-weight: bold;
   text-align: center;
-  background: lightgray;
+  background: rgb(150, 150, 150);
   border: 0px;
   float: right;
   padding-top: 20%;

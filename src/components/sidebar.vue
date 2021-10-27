@@ -8,10 +8,10 @@
             <i class="bi-circle-fill" style="color: orange"></i>
             <i class="bi-circle-fill" style="color: green"></i>
           </div>
-          <div class="col-5 name-header">
+          <div class="col-7 name-header">
             <p>{{ userNameOrig }}</p>
           </div>
-          <div class="col-1">
+          <div class="col-2">
             <button type="button" class="circle" @click="ShowEditComp(false)">
               {{ personInfo.editNamebtn }}
             </button>

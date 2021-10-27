@@ -1,7 +1,7 @@
 <template>
   <div class="container main-container" v-if="isLoaded">
     <div class="row">
-      <div class="col sidebar-theme">
+      <div class="col-5 sidebar-theme">
         <sidebar
           :people="sidebarData"
           :userNameOrig="userFullname"

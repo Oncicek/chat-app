@@ -5,11 +5,10 @@
         <div class="circle">
           {{ personInfo.nameInitials }}
         </div>
-        <!-- <i class="bi-alarm" style="font-size: 2rem; color: cornflowerblue"></i> -->
       </div>
-      <div class="col-10">
-        <div>{{ favoritePerson.displayName }}</div>
-        <div v-if="state">{{ state.lastMessage }}</div>
+      <div class="col-11 fav-content">
+        <div class="name">{{ favoritePerson.displayName }}</div>
+        <div v-if="state" class="content">{{ state.lastMessage }}</div>
       </div>
     </div>
   </div>
@@ -83,11 +82,24 @@ export default {
   height: 40px;
   border-radius: 250px;
   font-size: 15px;
-  color: black;
+  color: #fff;
   font-weight: bold;
   text-align: center;
-  background: lightgray;
+  background: rgb(150, 150, 150);
   border: 0px;
-  padding-top: 35%;
+  padding-top: 8px;
+}
+
+.fav-content {
+  padding-left: 25px;
+  line-height: normal;
+}
+
+.name {
+  font-weight: bold;
+}
+
+.content {
+  color: rgb(150, 150, 150);
 }
 </style>
