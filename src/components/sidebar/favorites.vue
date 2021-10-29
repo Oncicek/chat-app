@@ -48,7 +48,7 @@ export default {
     onMounted(() => {
       GetNameInitials(personInfo.nameInitials)
 
-      emitter.on('favMessage', (favMessage: any) => {
+      emitter.on('fav-message', (favMessage: any) => {
         state.favouriteData =
           favMessage.find(
             (x: any) => x.favoritePersonId === props.favoritePerson.id
@@ -62,7 +62,7 @@ export default {
       })
     })
     onUnmounted(() => {
-      emitter.off('favMessage')
+      emitter.off('fav-message')
     })
 
     return {

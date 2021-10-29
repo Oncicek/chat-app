@@ -24,14 +24,13 @@
 
 <script lang="ts">
 import Sidebar from './components/sidebar.vue'
-import Conversations from './components/conversations.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
 import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import axios from 'axios'
 
 export default {
-  components: { Chat, Sidebar, Conversations, Edit },
+  components: { Chat, Sidebar, Edit },
   setup() {
     const emitter: any = inject('emitter')
     const peopleData: any = ref([])
@@ -118,12 +117,12 @@ export default {
       console.log('favoriteData: ', favoriteData.value)
     }
 
-    emitter.on('ShowEditComp', (isFromRow: boolean) => {
+    emitter.on('show-edit-comp', (isFromRow: boolean) => {
       ShowEditComp(isFromRow)
     })
 
-    emitter.on('updateUser', (id: number) => {
-      UpdateUserData(id)
+    emitter.on('update-user', (id: number) => {
+      updateUserData(id)
     })
 
     const ShowEditComp = (isFromRow: boolean) => {
@@ -138,14 +137,16 @@ export default {
       chatSide.value = originalData[0]
     }
 
-    const UpdateFavorites = (chatId: number) => {
+    const UpdateFavorites = (chatIdParam: any) => {
       let userId = userNameId.value
+      let chatId = parseInt(chatIdParam)
 
       peopleData.value.forEach((x: any) => {
         if (parseInt(x.id) === userId) {
           let indexInFavs = x.myFavorites.indexOf(chatId)
+          console.log(x.myFavorites.indexOf(chatId))
           let indexInPeople = favoriteData.value.findIndex(
-            (y: any) => parseInt(y.id) == chatId
+            (y: any) => parseInt(y.id) === chatId
           )
           if (parseInt(indexInFavs) === -1) {
             x.myFavorites.push(chatId)
@@ -158,7 +159,7 @@ export default {
             x.myFavorites.splice(indexInFavs, 1)
             favoriteData.value.splice(indexInPeople, 1)
           }
-          console.log(x.myFavorites)
+          console.log('Favorites: ', x.myFavorites)
         }
       })
 
@@ -180,10 +181,10 @@ export default {
         (person: any) => parseInt(person.id) == fromId
       )
       // peopleData.value.splice(index, 1)
-      // UpdateUserData(userNameId.value)
+      // update-userData(userNameId.value)
     }
 
-    const UpdateUserData = (id: number) => {
+    const updateUserData = (id: number) => {
       peopleData.value.forEach((x: any) => {
         if (x.id == id) {
           x.active = true
@@ -218,34 +219,34 @@ export default {
     onMounted(() => {
       FetchUsersData()
 
-      emitter.on('updateUser', (id: number) => {
+      emitter.on('update-user', (id: number) => {
         state.manAdded = []
-        UpdateUserData(id)
+        updateUserData(id)
       })
 
-      emitter.on('favFromPeople', (fromId: number) => {
+      emitter.on('fav-from-people', (fromId: number) => {
         UpdateFavorites(fromId)
       })
 
-      emitter.on('destroyFromPeople', (fromId: number) => {
+      emitter.on('destroy-from-people', (fromId: number) => {
         DestroyPerson(fromId)
       })
 
-      emitter.on('resetConfig', () => {
+      emitter.on('reset-config', () => {
         FetchUsersData(true)
       })
 
-      emitter.on('addToFavorites', (chatId: number) => {
+      emitter.on('add-to-favorites', (chatId: any) => {
         UpdateFavorites(chatId)
       })
     })
 
     onUnmounted(() => {
-      emitter.off('updateUser')
+      emitter.off('update-user')
       emitter.off('addToFavorites')
       emitter.off('destroyFromPeople')
       emitter.off('favFromPeople')
-      emitter.off('resetConfig')
+      emitter.off('reset-config')
     })
 
     return {

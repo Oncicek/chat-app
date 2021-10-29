@@ -9,11 +9,11 @@
             <i class="bi-circle-fill" style="color: green"></i>
           </div>
           <div class="col-7 name-header">
-            <p>{{ userNameOrig }}</p>
+            <strong>{{ userNameOrig }}</strong>
           </div>
           <div class="col-2">
             <button type="button" class="circle" @click="ShowEditComp(false)">
-              {{ personInfo.editNamebtn }}
+              <strong>{{ personInfo.editNamebtn }}</strong>
             </button>
           </div>
         </div>
@@ -90,11 +90,11 @@ export default {
     })
 
     const getChat = (id: number, chatName: string) => {
-      emitter.emit('getChat', { id, chatName })
+      emitter.emit('get-chat', { id, chatName })
     }
 
     const ShowEditComp = (isFromRow: boolean) => {
-      emitter.emit('ShowEditComp', isFromRow)
+      emitter.emit('show-edit-comp', isFromRow)
     }
 
     const showFavs = () => {

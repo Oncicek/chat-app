@@ -47,9 +47,9 @@ export default {
 
     const peopleBtn = (event: any) => {
       if (event.target.value == 0) {
-        emitter.emit('favFromPeople', state.userId)
+        emitter.emit('fav-from-people', state.userId)
       } else {
-        emitter.emit('destroyFromPeople', state.userId)
+        emitter.emit('destroy-from-people', state.userId)
       }
       console.log(event.target.value)
     }

@@ -106,7 +106,7 @@ export default {
       state.conversationId = CalcConvId(state.userNameId, state.chatNameId)
     }
 
-    emitter.on('getChat', (chat: any) => {
+    emitter.on('get-chat', (chat: any) => {
       state.chatNameId = chat.id
       state.chatName = chat.chatName
 
@@ -130,7 +130,7 @@ export default {
         favoriteData.value.push(favs)
       }
 
-      emitter.emit('favMessage', favoriteData.value)
+      emitter.emit('fav-message', favoriteData.value)
     }
 
     const CalcConvId = (userNameId: string, chatNameId: any) => {
@@ -149,7 +149,7 @@ export default {
     }
 
     const AddToFavorites = (chatId: number) => {
-      emitter.emit('addToFavorites', chatId)
+      emitter.emit('add-to-favorites', chatId)
     }
 
     const GetisFavedBtn = () => {
@@ -199,7 +199,7 @@ export default {
     })
 
     onUnmounted(() => {
-      emitter.off('getChat')
+      emitter.off('get-chat')
     })
 
     return {
