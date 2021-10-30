@@ -33,7 +33,7 @@
             <template v-slot:footer>
               <div class="row">
                 <div class="col">
-                  <button class="btn btn-danger" @click="closeModal">
+                  <button class="btn btn-danger" @click="cancelEditChanges">
                     Cancel
                   </button>
                 </div>
@@ -104,6 +104,11 @@ export default {
     const saveEditChanges = () => {
       closeModal()
       ShowData(peopleData.value)
+    }
+
+    const cancelEditChanges = () => {
+      closeModal()
+      FetchUsersData()
     }
 
     const properties = reactive({
@@ -321,6 +326,7 @@ export default {
       saveEditChanges,
       prepareDisplayName,
       prepareFullName,
+      cancelEditChanges,
     }
   },
 }
