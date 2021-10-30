@@ -1,26 +1,36 @@
 <template>
-  <div>
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <div class="circle">
-              {{ personInfo.nameInitials }}
-            </div>
-          </td>
-          <td class="align-middle displayName">
-            {{ person.displayName }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div
+    class="container"
+    @mouseover="state.hover = true"
+    @mouseleave="state.hover = false"
+  >
+    <div class="row">
+      <div class="col-1">
+        <div class="circle">
+          {{ personInfo.nameInitials }}
+        </div>
+      </div>
+      <div class="col-6">
+        {{ person.displayName }}
+      </div>
+      <div class="col-5">
+        <dropdown
+          class="dropdown"
+          :class="{ 'show-btn': state.hover }"
+          :options="options"
+          :userId="state.userId"
+        ></dropdown>
+      </div>
+    </div>
   </div>
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject } from 'vue'
+import { reactive, onMounted, ref, inject, watch } from 'vue'
+import Dropdown from '../shared/dropdown.vue'
 
 export default {
+  components: { Dropdown },
   props: {
     person: {
       type: Object,
@@ -31,13 +41,20 @@ export default {
   setup(props: any) {
     const emitter: any = inject('emitter')
     let nameInitials = ref(props.person.fullName)
+    let userId: any = ref(props.person['id'])
+
+    const options = ref([
+      { value: 'Favorites Add / Remove', id: 0 },
+      { value: 'Remove from People', id: 1 },
+    ])
 
     const personInfo = reactive({
       nameInitials: nameInitials.value,
     })
 
     const state = reactive({
-      userId: props.person['id'],
+      userId: parseInt(userId.value),
+      hover: false,
     })
 
     const GetNameInitials = (fullName: string) => {
@@ -45,38 +62,25 @@ export default {
       personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
     }
 
-    const peopleBtn = (event: any) => {
-      if (event.target.value == 0) {
-        emitter.emit('fav-from-people', state.userId)
-      } else {
-        emitter.emit('destroy-from-people', state.userId)
-      }
-      console.log(event.target.value)
-    }
-
     onMounted(() => {
       GetNameInitials(personInfo.nameInitials)
-      console.log(personInfo.nameInitials)
     })
 
     return {
       props,
-      peopleBtn,
       state,
       personInfo,
       nameInitials,
       GetNameInitials,
+      options,
     }
   },
 }
 </script>
 
 <style lang="scss" scoped>
-.displayName {
-  padding-left: 10px;
-}
-
 .circle {
+  padding-top: 6px;
   width: 30px;
   height: 30px;
   border-radius: 250px;
@@ -86,7 +90,13 @@ export default {
   text-align: center;
   background: rgb(150, 150, 150);
   border: 0px;
-  float: right;
-  padding-top: 20%;
+}
+
+.dropdown {
+  display: none;
+}
+
+.show-btn {
+  display: block;
 }
 </style>

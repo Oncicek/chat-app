@@ -4,7 +4,7 @@
       <header><strong>Preferences</strong></header>
     </div>
     <hr />
-    <div class="row first-part">
+    <div class="row name-part">
       <div class="col-3">
         <p>Name</p>
       </div>
@@ -15,15 +15,13 @@
         <p>{{ '(' + user.fullName + ')' }}</p>
       </div>
       <div class="col-3">
-        <button class="btn btn-outline-dark" @click="!state.showModal">
-          Edit
-        </button>
+        <button class="btn btn-outline-dark" @click="onEditClick">Edit</button>
       </div>
     </div>
     <hr />
     <div class="row">
-      <header>Appearance</header>
-      <div class="col">
+      <header class="sub-header">Appearance</header>
+      <div class="col-2 appearance-part">
         <p>Theme</p>
       </div>
       <div class="col">
@@ -55,38 +53,41 @@
         </div>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <button>Click</button>
+    <div class="row last-row-appearance">
+      <div class="col-2">
+        <label class="switch">
+          <input
+            type="checkbox"
+            v-model="state.isShowFavs"
+            @click="showFavs(event)"
+          />
+          <span class="slider round"></span>
+        </label>
       </div>
       <div class="col">
         <span>Show favorites in sidebar</span>
       </div>
     </div>
-    <div class="row">
-      <div class="col">
-        <label class="switch">
-          <input type="checkbox" @click="showFavs(event)" />
-          <span class="slider round"></span>
-        </label>
-      </div>
-      <div class="col">
-        <span>Show / hide favorites</span>
-      </div>
-    </div>
     <hr />
     <div class="row">
-      <header>Debug</header>
-      <div class="col">
+      <header class="sub-header">Debug</header>
+
+      <div class="col-6">
         <p>Active user</p>
       </div>
-      <div class="col">
-        <select v-model="selectedUser" @change="updateUser">
+      <div class="col-5">
+        <select class="form-select" v-model="selectedUser" @change="updateUser">
           <option v-for="person in people" :key="person.id" :value="person.id">
             {{ person.fullName }}
           </option>
         </select>
-        <button @click="resetConfig">Reset Config</button>
+      </div>
+      <div class="row config-wrapper">
+        <div class="col">
+          <button class="btn btn-outline-dark" @click="resetConfig">
+            Reset Config
+          </button>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -100,7 +101,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject } from 'vue'
+import { reactive, onMounted, ref, inject, watch } from 'vue'
 
 export default {
   props: {
@@ -116,14 +117,29 @@ export default {
     const user: any = ref([])
     let isShowFavs = ref(true)
     let showAlert = ref(false)
+    let showModal = ref(false)
     let alertText = ref('')
     showAlert.value = false
 
     const state = reactive({
       showAlert: showAlert.value,
+      showModal: showModal.value,
       alertText: alertText.value,
       isShowFavs: isShowFavs.value,
     })
+
+    // watch(
+    //   () => state.showModal,
+    //   () => {
+    //     emitter.emit('show-modal', true)
+    //   }
+    // )
+
+    const onEditClick = () => {
+      emitter.emit('show-modal')
+    }
+
+    state.showModal
 
     const nah = (event: any) => {
       state.showAlert = true
@@ -146,9 +162,13 @@ export default {
       emitter.emit('update-user', selectedUser.value)
     }
 
-    const showFavs = (isShown: boolean) => {
-      emitter.emit('toggle-favs', isShown)
+    const showFavs = () => {
+      emitter.emit('show-favs-edit', state.isShowFavs)
     }
+
+    emitter.on('show-favs-sidebar', (isFavsShown: boolean) => {
+      state.isShowFavs = isFavsShown
+    })
 
     const resetConfig = () => {
       emitter.emit('reset-config')
@@ -166,8 +186,9 @@ export default {
       updateUser,
       state,
       resetConfig,
-      showFavs,
       nah,
+      showFavs,
+      onEditClick,
     }
   },
 }
@@ -176,8 +197,16 @@ export default {
 .switch {
   position: relative;
   display: inline-block;
-  width: 60px;
-  height: 34px;
+  width: 50px;
+  height: 25px;
+}
+
+.config-wrapper {
+  padding-top: 200px;
+}
+
+.sub-header {
+  padding-bottom: 25px;
 }
 
 /* Hide default HTML checkbox */
@@ -208,9 +237,9 @@ p {
 .slider:before {
   position: absolute;
   content: '';
-  height: 26px;
-  width: 26px;
-  left: 4px;
+  height: 18px;
+  width: 18px;
+  left: 3px;
   bottom: 4px;
   background-color: white;
   -webkit-transition: 0.4s;
@@ -244,7 +273,7 @@ input:checked + .slider:before {
   border-radius: 50%;
 }
 
-.first-part {
+.name-part {
   padding: 40px 0px 30px 0px;
 }
 
@@ -274,30 +303,8 @@ input:checked + .slider:before {
   border-radius: 15px;
 }
 
-.alert-flash {
-  -moz-animation: cssAnimation 0s ease-in 5s forwards;
-  /* Firefox */
-  -webkit-animation: cssAnimation 0s ease-in 5s forwards;
-  /* Safari and Chrome */
-  -o-animation: cssAnimation 0s ease-in 5s forwards;
-  /* Opera */
-  animation: cssAnimation 0s ease-in 5s forwards;
-  -webkit-animation-fill-mode: forwards;
-  animation-fill-mode: forwards;
-}
-@keyframes cssAnimation {
-  to {
-    width: 0;
-    height: 0;
-    overflow: hidden;
-  }
-}
-@-webkit-keyframes cssAnimation {
-  to {
-    width: 0;
-    height: 0;
-    visibility: hidden;
-  }
+.last-row-appearance {
+  padding-bottom: 120px;
 }
 
 header {

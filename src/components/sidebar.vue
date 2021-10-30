@@ -19,16 +19,28 @@
         </div>
       </div>
     </div>
-    <div class="row" v-if="personInfo.isShowFavs">
+    <div class="row">
       <div class="col">
         <header>Favorites</header>
       </div>
       <div class="col">
-        <button @click="showFavs" class="chevron-btn">
+        <button
+          @click="showFavs"
+          class="chevron-btn"
+          v-if="!personInfo.isShowFavs"
+        >
           <i class="bi-chevron-down"></i>
+        </button>
+        <button
+          @click="showFavs"
+          class="chevron-btn"
+          v-if="personInfo.isShowFavs"
+        >
+          <i class="bi-chevron-up"></i>
         </button>
       </div>
       <favorites
+        v-if="personInfo.isShowFavs"
         class="favoriteTab"
         v-for="favoritePerson in favoritePeople"
         :key="favoritePerson.id"
@@ -99,6 +111,8 @@ export default {
 
     const showFavs = () => {
       personInfo.isShowFavs = !personInfo.isShowFavs
+      emitter.emit('show-favs-sidebar', personInfo.isShowFavs)
+      console.log('vec')
     }
 
     const SwitchHeader = () => {
@@ -108,6 +122,10 @@ export default {
         return userName.value
       }
     }
+
+    emitter.on('show-favs-edit', (isFavsShown: boolean) => {
+      personInfo.isShowFavs = !isFavsShown
+    })
 
     const GetNameInitials = (fullName: string) => {
       let name = fullName.split(' ')
@@ -142,7 +160,7 @@ header {
 }
 
 .peopleTab:hover {
-  background-color: aqua;
+  border: 0.5px solid lightgray;
 }
 
 .peopleTab {
@@ -150,7 +168,7 @@ header {
 }
 
 .favoriteTab:hover {
-  background-color: green;
+  border: 0.5px solid lightgray;
 }
 
 .favoriteTab {

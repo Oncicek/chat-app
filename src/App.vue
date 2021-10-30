@@ -18,6 +18,35 @@
           :favoritePeople="favoriteData"
         />
       </div>
+      <div v-if="properties.showModal">
+        <transition name="modal">
+          <modal @close="properties.showModal = false">
+            <template v-slot:header>
+              <h3>Edit options</h3>
+            </template>
+            <template v-slot:body>
+              <label> Display name: </label
+              ><input type="text" v-model="user.displayName" />
+              <label> Full name: </label
+              ><input type="text" v-model="user.fullName" />
+            </template>
+            <template v-slot:footer>
+              <div class="row">
+                <div class="col">
+                  <button class="btn btn-danger" @click="closeModal">
+                    Cancel
+                  </button>
+                </div>
+                <div class="col">
+                  <button class="btn btn-primary" @click="saveEditChanges">
+                    OK
+                  </button>
+                </div>
+              </div>
+            </template>
+          </modal>
+        </transition>
+      </div>
     </div>
   </div>
 </template>
@@ -26,11 +55,12 @@
 import Sidebar from './components/sidebar.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
+import Modal from './components/shared/modal.vue'
 import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
 import axios from 'axios'
 
 export default {
-  components: { Chat, Sidebar, Edit },
+  components: { Chat, Sidebar, Edit, Modal },
   setup() {
     const emitter: any = inject('emitter')
     const peopleData: any = ref([])
@@ -47,6 +77,7 @@ export default {
     let manAdded: any = ref([])
     const chatSide: any = ref([])
     let userFromFav = ref(-1)
+    let showModal = ref(true)
 
     const FetchUsersData = async (forceFetch: boolean = false) => {
       if (CachedData() && !forceFetch) {
@@ -65,6 +96,18 @@ export default {
 
         isLoaded.value = true
       }
+    }
+
+    const saveEditChanges = () => {
+      closeModal()
+    }
+
+    const properties = reactive({
+      showModal: showModal.value,
+    })
+
+    const closeModal = () => {
+      properties.showModal = false
     }
 
     const ShowData = (data: any) => {
@@ -180,8 +223,8 @@ export default {
       let index: number = peopleData.value.findIndex(
         (person: any) => parseInt(person.id) == fromId
       )
-      // peopleData.value.splice(index, 1)
-      // update-userData(userNameId.value)
+      peopleData.value.splice(index, 1)
+      updateUserData(userNameId.value)
     }
 
     const updateUserData = (id: number) => {
@@ -236,8 +279,17 @@ export default {
         FetchUsersData(true)
       })
 
+      emitter.on('close-modal', () => {
+        properties.showModal = false
+        console.log(properties.showModal)
+      })
+
       emitter.on('add-to-favorites', (chatId: any) => {
         UpdateFavorites(chatId)
+      })
+
+      emitter.on('show-modal', () => {
+        properties.showModal = true
       })
     })
 
@@ -271,6 +323,9 @@ export default {
       CachedData,
       DestroyPerson,
       userFullname,
+      properties,
+      closeModal,
+      saveEditChanges,
     }
   },
 }
