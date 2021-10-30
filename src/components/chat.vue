@@ -69,7 +69,7 @@ export default {
     const conversationId = ref(0)
     let favoriteData: any = ref([])
     let user: any = ref([])
-    let isFavedBtn = ref(false)
+    let isFavedBtn = ref()
 
     const state = reactive({
       chatName: props.chatSide['displayName'],
@@ -150,9 +150,10 @@ export default {
 
     const AddToFavorites = (chatId: number) => {
       emitter.emit('add-to-favorites', chatId)
+      GetIsFavedBtn()
     }
 
-    const GetisFavedBtn = () => {
+    const GetIsFavedBtn = () => {
       let isFaved = Object.values(state.favPeople).findIndex(
         (x: any) => x.id === state.chatNameId
       )
@@ -187,13 +188,13 @@ export default {
         clearedMsg.reverse()
 
         GetFavoriteMessage(props.favoritePeople, messages)
-        GetisFavedBtn()
+        GetIsFavedBtn()
         state.messages = clearedMsg
       })
     }
 
     onMounted(() => {
-      GetisFavedBtn()
+      GetIsFavedBtn()
       GetConversationId()
       GetFreshData(state.conversationId)
     })
@@ -211,7 +212,7 @@ export default {
       CalcConvId,
       favoriteData,
       AddToFavorites,
-      GetisFavedBtn,
+      GetIsFavedBtn,
     }
   },
 }

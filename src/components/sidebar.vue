@@ -88,7 +88,6 @@ export default {
     const emitter: any = inject('emitter')
     const inputUserName = ref('')
     const peopleSaved = ref(props.people)
-    const favIds = ref([])
 
     let userName = ref(props.userName)
     let isLogged = ref('')
@@ -112,7 +111,6 @@ export default {
     const showFavs = () => {
       personInfo.isShowFavs = !personInfo.isShowFavs
       emitter.emit('show-favs-sidebar', personInfo.isShowFavs)
-      console.log('vec')
     }
 
     const SwitchHeader = () => {
@@ -122,6 +120,13 @@ export default {
         return userName.value
       }
     }
+
+    watch(
+      () => props.userNameOrig,
+      () => {
+        GetNameInitials(props.userNameOrig)
+      }
+    )
 
     emitter.on('show-favs-edit', (isFavsShown: boolean) => {
       personInfo.isShowFavs = !isFavsShown

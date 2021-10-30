@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted, watch } from 'vue'
 
 export default {
   props: {
@@ -37,7 +37,7 @@ export default {
     const state = reactive({
       favoritePerson: props.favoritePerson['displayName'],
       favouriteData: favouriteData,
-      lastMessage: lastMessage,
+      lastMessage: lastMessage.value,
     })
 
     const GetNameInitials = (fullName: string) => {
@@ -45,20 +45,33 @@ export default {
       personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
     }
 
+    const GetMessage = (favMessage: any) => {
+      state.favouriteData =
+        favMessage.find(
+          (x: any) => x.favoritePersonId === props.favoritePerson.id
+        ) || ''
+
+      if (state.favouriteData.lastMessage) {
+        state.lastMessage = state.favouriteData.lastMessage
+      }
+    }
+
+    watch(
+      () => props.favoritePerson,
+      (first, second) => {
+        console.log(
+          'Watch props.selected function called with args:',
+          first,
+          second
+        )
+      }
+    )
+
     onMounted(() => {
       GetNameInitials(personInfo.nameInitials)
 
       emitter.on('fav-message', (favMessage: any) => {
-        state.favouriteData =
-          favMessage.find(
-            (x: any) => x.favoritePersonId === props.favoritePerson.id
-          ) || ''
-
-        console.log(favMessage)
-
-        if (state.favouriteData.lastMessage) {
-          state.lastMessage = state.favouriteData.lastMessage
-        }
+        GetMessage(favMessage)
       })
     })
     onUnmounted(() => {

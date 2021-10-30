@@ -77,7 +77,10 @@ export default {
     let manAdded: any = ref([])
     const chatSide: any = ref([])
     let userFromFav = ref(-1)
-    let showModal = ref(true)
+    let showModal = ref(false)
+
+    let prepareDisplayName = ref('')
+    let prepareFullName = ref('')
 
     const FetchUsersData = async (forceFetch: boolean = false) => {
       if (CachedData() && !forceFetch) {
@@ -100,6 +103,7 @@ export default {
 
     const saveEditChanges = () => {
       closeModal()
+      ShowData(peopleData.value)
     }
 
     const properties = reactive({
@@ -159,14 +163,6 @@ export default {
       console.log('userFavorite: ', userFavorite.value)
       console.log('favoriteData: ', favoriteData.value)
     }
-
-    emitter.on('show-edit-comp', (isFromRow: boolean) => {
-      ShowEditComp(isFromRow)
-    })
-
-    emitter.on('update-user', (id: number) => {
-      updateUserData(id)
-    })
 
     const ShowEditComp = (isFromRow: boolean) => {
       if (isFromRow) {
@@ -262,9 +258,13 @@ export default {
     onMounted(() => {
       FetchUsersData()
 
+      emitter.on('show-edit-comp', (isFromRow: boolean) => {
+        ShowEditComp(isFromRow)
+      })
+
       emitter.on('update-user', (id: number) => {
-        state.manAdded = []
         updateUserData(id)
+        ShowData(peopleData.value)
       })
 
       emitter.on('fav-from-people', (fromId: number) => {
@@ -281,7 +281,6 @@ export default {
 
       emitter.on('close-modal', () => {
         properties.showModal = false
-        console.log(properties.showModal)
       })
 
       emitter.on('add-to-favorites', (chatId: any) => {
@@ -293,13 +292,7 @@ export default {
       })
     })
 
-    onUnmounted(() => {
-      emitter.off('update-user')
-      emitter.off('addToFavorites')
-      emitter.off('destroyFromPeople')
-      emitter.off('favFromPeople')
-      emitter.off('reset-config')
-    })
+    onUnmounted(() => {})
 
     return {
       ShowEditComp,
@@ -326,6 +319,8 @@ export default {
       properties,
       closeModal,
       saveEditChanges,
+      prepareDisplayName,
+      prepareFullName,
     }
   },
 }

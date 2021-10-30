@@ -128,18 +128,9 @@ export default {
       isShowFavs: isShowFavs.value,
     })
 
-    // watch(
-    //   () => state.showModal,
-    //   () => {
-    //     emitter.emit('show-modal', true)
-    //   }
-    // )
-
     const onEditClick = () => {
       emitter.emit('show-modal')
     }
-
-    state.showModal
 
     const nah = (event: any) => {
       state.showAlert = true
@@ -160,6 +151,7 @@ export default {
 
     const updateUser = () => {
       emitter.emit('update-user', selectedUser.value)
+      findActive()
     }
 
     const showFavs = () => {
