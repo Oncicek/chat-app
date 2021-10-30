@@ -19,33 +19,42 @@
         />
       </div>
       <div v-if="properties.showModal">
-        <transition name="modal">
-          <modal @close="properties.showModal = false">
-            <template v-slot:header>
-              <h3>Edit options</h3>
-            </template>
-            <template v-slot:body>
-              <label> Display name: </label
-              ><input type="text" v-model="user.displayName" />
-              <label> Full name: </label
-              ><input type="text" v-model="user.fullName" />
-            </template>
-            <template v-slot:footer>
-              <div class="row">
-                <div class="col">
-                  <button class="btn btn-danger" @click="cancelEditChanges">
-                    Cancel
-                  </button>
+        <form
+          action="
+        "
+        >
+          <transition name="modal">
+            <modal @close="properties.showModal = false">
+              <template v-slot:header>
+                <h3>Edit options</h3>
+              </template>
+              <template v-slot:body>
+                <label> Display name: </label
+                ><input type="text" v-model="user.displayName" />
+                <label> Full name: </label
+                ><input type="text" v-model="user.fullName" />
+              </template>
+              <template v-slot:footer>
+                <div class="row">
+                  <div class="col">
+                    <button class="btn btn-danger" @click="cancelEditChanges()">
+                      Cancel
+                    </button>
+                  </div>
+                  <div class="col">
+                    <button
+                      class="btn btn-primary"
+                      @click.prevent="saveEditChanges()"
+                      type="submit"
+                    >
+                      OK
+                    </button>
+                  </div>
                 </div>
-                <div class="col">
-                  <button class="btn btn-primary" @click="saveEditChanges">
-                    OK
-                  </button>
-                </div>
-              </div>
-            </template>
-          </modal>
-        </transition>
+              </template>
+            </modal>
+          </transition>
+        </form>
       </div>
     </div>
   </div>
@@ -79,9 +88,6 @@ export default {
     let userFromFav = ref(-1)
     let showModal = ref(false)
 
-    let prepareDisplayName = ref('')
-    let prepareFullName = ref('')
-
     const FetchUsersData = async (forceFetch: boolean = false) => {
       if (CachedData() && !forceFetch) {
         ShowData(peopleData.value)
@@ -108,7 +114,6 @@ export default {
 
     const cancelEditChanges = () => {
       closeModal()
-      FetchUsersData()
     }
 
     const properties = reactive({
@@ -324,8 +329,6 @@ export default {
       properties,
       closeModal,
       saveEditChanges,
-      prepareDisplayName,
-      prepareFullName,
       cancelEditChanges,
     }
   },

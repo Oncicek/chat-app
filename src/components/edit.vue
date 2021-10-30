@@ -287,6 +287,10 @@ input:checked + .slider:before {
   border: none !important;
 }
 
+.form-select {
+  border-radius: 20px;
+}
+
 .alert-danger {
   position: absolute;
   bottom: 15px;

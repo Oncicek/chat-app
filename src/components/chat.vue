@@ -321,10 +321,11 @@ export default {
     footer {
       position: sticky;
       bottom: 0px;
-      box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
       padding: 0px 20px;
       form {
         display: flex;
+        box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
+        border-radius: 20px;
         input[type='text'] {
           border: 0px;
           border-radius: 20px;
