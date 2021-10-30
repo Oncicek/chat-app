@@ -3,6 +3,7 @@
     class="container"
     @mouseover="state.hover = true"
     @mouseleave="state.hover = false"
+    @click="getChat(person.id, person.displayName)"
   >
     <div class="row">
       <div class="col-1">
@@ -52,6 +53,10 @@ export default {
       nameInitials: nameInitials.value,
     })
 
+    const getChat = (id: number, chatName: string) => {
+      emitter.emit('get-chat', { id, chatName })
+    }
+
     const state = reactive({
       userId: parseInt(userId.value),
       hover: false,
@@ -73,6 +78,7 @@ export default {
       nameInitials,
       GetNameInitials,
       options,
+      getChat,
     }
   },
 }

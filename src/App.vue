@@ -65,7 +65,7 @@ import Sidebar from './components/sidebar.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
 import Modal from './components/shared/modal.vue'
-import { reactive, onMounted, ref, inject, onUnmounted } from 'vue'
+import { reactive, onMounted, ref, inject, onUnmounted, watch } from 'vue'
 import axios from 'axios'
 
 export default {

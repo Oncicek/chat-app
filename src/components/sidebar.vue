@@ -45,10 +45,7 @@
         v-for="favoritePerson in favoritePeople"
         :key="favoritePerson.id"
         :favoritePerson="favoritePerson"
-        @click="
-          ShowEditComp(true),
-            getChat(favoritePerson.id, favoritePerson.displayName)
-        "
+        @click="ShowEditComp(true)"
       />
     </div>
     <div class="row">
@@ -58,7 +55,7 @@
         v-for="person in people"
         :key="person.id"
         :person="person"
-        @click="ShowEditComp(true), getChat(person.id, person.displayName)"
+        @click="ShowEditComp(true)"
       />
     </div>
   </div>
@@ -99,10 +96,6 @@ export default {
       editNamebtn: editNamebtn.value,
       isShowFavs: isShowFavs.value,
     })
-
-    const getChat = (id: number, chatName: string) => {
-      emitter.emit('get-chat', { id, chatName })
-    }
 
     const ShowEditComp = (isFromRow: boolean) => {
       emitter.emit('show-edit-comp', isFromRow)
@@ -146,7 +139,6 @@ export default {
       isLogged,
       ShowEditComp,
       infoTab,
-      getChat,
       userName,
       SwitchHeader,
       props,

@@ -1,5 +1,8 @@
 <template>
-  <div class="container">
+  <div
+    @click="getChat(favoritePerson.id, favoritePerson.displayName)"
+    class="container"
+  >
     <div class="row">
       <div class="col-1">
         <div class="circle">
@@ -34,6 +37,11 @@ export default {
     const personInfo = reactive({
       nameInitials: nameInitials.value,
     })
+
+    const getChat = (id: number, chatName: string) => {
+      emitter.emit('get-chat', { id, chatName })
+    }
+
     const state = reactive({
       favoritePerson: props.favoritePerson['displayName'],
       favouriteData: favouriteData,
@@ -56,23 +64,12 @@ export default {
       }
     }
 
-    watch(
-      () => props.favoritePerson,
-      (first, second) => {
-        console.log(
-          'Watch props.selected function called with args:',
-          first,
-          second
-        )
-      }
-    )
+    emitter.on('fav-message', (favMessage: any) => {
+      GetMessage(favMessage)
+    })
 
     onMounted(() => {
       GetNameInitials(personInfo.nameInitials)
-
-      emitter.on('fav-message', (favMessage: any) => {
-        GetMessage(favMessage)
-      })
     })
     onUnmounted(() => {
       emitter.off('fav-message')
@@ -84,6 +81,7 @@ export default {
       personInfo,
       nameInitials,
       GetNameInitials,
+      getChat,
     }
   },
 }

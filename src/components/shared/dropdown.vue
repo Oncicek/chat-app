@@ -51,17 +51,6 @@ export default {
       }
     }
 
-    watch(
-      () => state.hover,
-      (first, second) => {
-        console.log(
-          'Watch props.selected function called with args:',
-          first,
-          second
-        )
-      }
-    )
-
     onMounted(() => {})
 
     return {
