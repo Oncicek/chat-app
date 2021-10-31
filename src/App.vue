@@ -56,7 +56,7 @@
           </transition>
         </form>
       </div>
-      <div v-if="login.isLogged < 0">
+      <div v-if="!login.isLogged < 0">
         <form @submit.prevent="loginToFirebase()">
           <transition name="modal">
             <modal :backColor="1">
@@ -203,7 +203,7 @@ export default {
     const GetSidebarData = (originalData: any) => {
       sidebarData.value = originalData.filter((x: any) => x.active === false)
 
-      GetFirstChat(sidebarData.value)
+      GetChat(sidebarData.value)
     }
 
     const GetUserData = (originalData: any) => {
@@ -254,8 +254,8 @@ export default {
       }
     )
 
-    const GetFirstChat = (originalData: any) => {
-      chatSide.value = originalData[0]
+    const GetChat = (originalData: any, chatId: number = 0) => {
+      chatSide.value = originalData[chatId]
     }
 
     const UpdateFavorites = (chatIdParam: any) => {
@@ -337,6 +337,10 @@ export default {
       }
     }
 
+    emitter.on('get-chat', (chat: any) => {
+      GetChat(sidebarData.value, chat.id)
+    })
+
     onMounted(() => {
       FetchUsersData()
 
@@ -401,7 +405,6 @@ export default {
       user,
       state,
       isLoaded,
-      GetFirstChat,
       UpdateFavorites,
       CachedData,
       DestroyPerson,
@@ -413,6 +416,7 @@ export default {
       login,
       loginToFirebase,
       loginError,
+      GetChat,
     }
   },
 }

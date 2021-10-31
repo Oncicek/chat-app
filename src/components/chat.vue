@@ -141,6 +141,7 @@ export default {
       for (let j = messages.length - 1; j >= 0; j--) {
         if (messages[j].userNameId) {
           if (parseInt(messages[j].conversationId) === parseInt(favs.convId)) {
+            console.log(messages[j].content)
             return messages[j].content
           }
         }
