@@ -56,7 +56,7 @@
           </transition>
         </form>
       </div>
-      <div v-if="!login.isLogged < 0">
+      <div v-if="login.isLogged < 0">
         <form @submit.prevent="loginToFirebase()">
           <transition name="modal">
             <modal :backColor="1">
@@ -337,12 +337,12 @@ export default {
       }
     }
 
-    emitter.on('get-chat', (chat: any) => {
-      GetChat(sidebarData.value, chat.id)
-    })
-
     onMounted(() => {
       FetchUsersData()
+
+      emitter.on('get-chat', (chat: any) => {
+        GetChat(sidebarData.value, chat.id)
+      })
 
       emitter.on('show-edit-comp', (isFromRow: boolean) => {
         ShowEditComp(isFromRow)

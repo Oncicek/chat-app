@@ -71,9 +71,7 @@ export default {
     onMounted(() => {
       GetNameInitials(personInfo.nameInitials)
     })
-    onUnmounted(() => {
-      emitter.off('fav-message')
-    })
+    onUnmounted(() => {})
 
     return {
       props,

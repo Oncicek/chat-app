@@ -154,6 +154,7 @@ export default {
 
     const updateUser = () => {
       emitter.emit('update-user', selectedUser.value)
+      emitter.emit('update-user-favs')
       findActive()
     }
 

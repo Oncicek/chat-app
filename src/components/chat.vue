@@ -150,8 +150,13 @@ export default {
 
     const AddToFavorites = (chatId: number) => {
       emitter.emit('add-to-favorites', chatId)
+      emitter.emit('fav-message', favoriteData.value)
       GetIsFavedBtn()
     }
+
+    emitter.on('update-user-favs', () => {
+      emitter.emit('fav-message', favoriteData.value)
+    })
 
     const GetIsFavedBtn = () => {
       let isFaved = Object.values(state.favPeople).findIndex(
