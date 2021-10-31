@@ -1,5 +1,5 @@
 <template>
-  <div class="modal-mask">
+  <div class="modal-mask" :class="{ 'get-black': props.backColor > 0 }">
     <div class="modal-wrapper">
       <div class="modal-container">
         <div class="modal-header">
@@ -20,19 +20,25 @@
 import { reactive, onMounted, ref, inject, watch } from 'vue'
 
 export default {
-  props: {},
+  props: {
+    backColor: Number,
+  },
 
   setup(props: any) {
-    const emitter: any = inject('emitter')
-
     onMounted(() => {})
 
-    return {}
+    return {
+      props,
+    }
   },
 }
 </script>
 
 <style lang="scss" scoped>
+.get-black {
+  background-color: black !important;
+}
+
 .modal-mask {
   position: fixed;
   z-index: 9998;

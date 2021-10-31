@@ -23,7 +23,7 @@
           "
         >
           <div class="message-inner">
-            <div class="username">{{ message.username }}</div>
+            <div class="username">{{ GetChatNames(message.userNameId) }}</div>
             <div class="username"></div>
             <div class="content">{{ message.content }}</div>
           </div>
@@ -141,7 +141,6 @@ export default {
       for (let j = messages.length - 1; j >= 0; j--) {
         if (messages[j].userNameId) {
           if (parseInt(messages[j].conversationId) === parseInt(favs.convId)) {
-            console.log(messages[j].content)
             return messages[j].content
           }
         }
@@ -193,6 +192,17 @@ export default {
       })
     }
 
+    const GetChatNames = (usernameIdParam: number) => {
+      switch (usernameIdParam) {
+        case state.chatNameId:
+          return state.chatName
+        case state.userNameId:
+          return state.username
+        default:
+          return 'missing id, please contact your IT administrator'
+      }
+    }
+
     onMounted(() => {
       GetIsFavedBtn()
       GetConversationId()
@@ -213,6 +223,7 @@ export default {
       favoriteData,
       AddToFavorites,
       GetIsFavedBtn,
+      GetChatNames,
     }
   },
 }

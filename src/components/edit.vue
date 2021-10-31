@@ -88,6 +88,9 @@
             Reset Config
           </button>
         </div>
+        <div class="col">
+          <button class="btn btn-outline-dark" @click="logout">Logout</button>
+        </div>
       </div>
     </div>
     <div class="row">
@@ -166,6 +169,10 @@ export default {
       emitter.emit('reset-config')
     }
 
+    const logout = () => {
+      emitter.emit('logout')
+    }
+
     onMounted(() => {
       findActive()
     })
@@ -181,6 +188,7 @@ export default {
       nah,
       showFavs,
       onEditClick,
+      logout,
     }
   },
 }

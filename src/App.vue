@@ -56,6 +56,38 @@
           </transition>
         </form>
       </div>
+      <div v-if="login.isLogged < 0">
+        <form @submit.prevent="loginToFirebase()">
+          <transition name="modal">
+            <modal :backColor="1">
+              <template v-slot:header>
+                <h3>Please log in:</h3>
+              </template>
+              <template v-slot:body>
+                <label> E-mail: </label
+                ><input type="text" class="login" v-model="login.email" />
+                <label> Password: </label
+                ><input
+                  type="password"
+                  class="login"
+                  v-model="login.password"
+                />
+              </template>
+              <template v-slot:footer>
+                <div class="row">
+                  <div class="alert alert-danger" v-if="login.isError">
+                    {{ 'Login failed. Please try again' }}
+                  </div>
+                </div>
+                <div v-if="login.isShowSpinner" class="lds-dual-ring"></div>
+                <button v-else class="btn btn-primary" type="submit">
+                  Login
+                </button>
+              </template>
+            </modal>
+          </transition>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -65,8 +97,9 @@ import Sidebar from './components/sidebar.vue'
 import Chat from './components/chat.vue'
 import Edit from './components/edit.vue'
 import Modal from './components/shared/modal.vue'
-import { reactive, onMounted, ref, inject, onUnmounted, watch } from 'vue'
+import { reactive, onMounted, ref, inject, watch } from 'vue'
 import axios from 'axios'
+import firebase from './db'
 
 export default {
   components: { Chat, Sidebar, Edit, Modal },
@@ -90,6 +123,7 @@ export default {
 
     const FetchUsersData = async (forceFetch: boolean = false) => {
       if (CachedData() && !forceFetch) {
+        login.isLogged = Number(localStorage.getItem('isLoggedIn'))
         ShowData(peopleData.value)
         isLoaded.value = true
         return
@@ -107,6 +141,29 @@ export default {
       }
     }
 
+    const loginError = () => {
+      login.isError = true
+
+      setTimeout(() => {
+        login.isError = false
+      }, 5000)
+    }
+
+    const loginToFirebase = () => {
+      login.isShowSpinner = true
+      firebase
+        .auth()
+        .signInWithEmailAndPassword(login.email, login.password)
+        .then(() => {
+          login.isLogged = 1
+          login.isShowSpinner = false
+        })
+        .catch(() => {
+          loginError()
+          login.isShowSpinner = false
+        })
+    }
+
     const saveEditChanges = () => {
       closeModal()
       ShowData(peopleData.value)
@@ -118,6 +175,14 @@ export default {
 
     const properties = reactive({
       showModal: showModal.value,
+    })
+
+    const login = reactive({
+      isLogged: -1,
+      email: '',
+      password: '',
+      isShowSpinner: false,
+      isError: false,
     })
 
     const closeModal = () => {
@@ -182,6 +247,13 @@ export default {
       }
     }
 
+    watch(
+      () => login.isLogged,
+      () => {
+        localStorage.setItem('isLoggedIn', String(login.isLogged))
+      }
+    )
+
     const GetFirstChat = (originalData: any) => {
       chatSide.value = originalData[0]
     }
@@ -218,7 +290,7 @@ export default {
     const CachedData = () => {
       if (localStorage.getItem('fakeApi')) {
         peopleData.value = JSON.parse(localStorage.getItem('fakeApi')!) || []
-        return false //set false for debug
+        return true //set false for debug
       } else {
         localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
         return false
@@ -287,6 +359,16 @@ export default {
 
       emitter.on('reset-config', () => {
         FetchUsersData(true)
+        login.isLogged = -1
+      })
+
+      emitter.on('logout', () => {
+        firebase
+          .auth()
+          .signOut()
+          .then(() => {
+            login.isLogged = -1
+          })
       })
 
       emitter.on('close-modal', () => {
@@ -301,8 +383,6 @@ export default {
         properties.showModal = true
       })
     })
-
-    onUnmounted(() => {})
 
     return {
       ShowEditComp,
@@ -330,6 +410,9 @@ export default {
       closeModal,
       saveEditChanges,
       cancelEditChanges,
+      login,
+      loginToFirebase,
+      loginError,
     }
   },
 }
@@ -362,5 +445,42 @@ export default {
 .chat-theme {
   padding: 0px !important;
   border-radius: 0px 20px 20px 0px;
+}
+
+.lds-dual-ring {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+}
+.lds-dual-ring:after {
+  content: ' ';
+  display: block;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 6px solid rgb(0, 0, 0);
+  border-color: #fff transparent rgb(4, 50, 255) transparent;
+  animation: lds-dual-ring 0.75s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.login {
+  width: 100%;
+  border-radius: 10px;
+  font-size: 15px;
+  padding: 5px 10px 5px 10px;
+  border: 0.5px solid lightgray;
+}
+
+.login:focus {
+  border: 0.5px solid lightgray;
+  outline: 0;
 }
 </style>
