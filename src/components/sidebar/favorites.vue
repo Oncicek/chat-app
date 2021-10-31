@@ -18,7 +18,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, onUnmounted, watch } from 'vue'
+import { reactive, onMounted, ref, inject } from 'vue'
 
 export default {
   props: {
@@ -48,12 +48,17 @@ export default {
       lastMessage: lastMessage.value,
     })
 
-    const GetNameInitials = (fullName: string) => {
+    const getNameInitials = (fullName: string) => {
       let name = fullName.split(' ')
-      personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
+
+      if (name.length > 1) {
+        personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
+      } else {
+        personInfo.nameInitials = name[0].charAt(0) + name[0].charAt(1)
+      }
     }
 
-    const GetMessage = (favMessage: any) => {
+    const getMessage = (favMessage: any) => {
       state.favouriteData =
         favMessage.find(
           (x: any) => x.favoritePersonId === props.favoritePerson.id
@@ -65,20 +70,19 @@ export default {
     }
 
     emitter.on('fav-message', (favMessage: any) => {
-      GetMessage(favMessage)
+      getMessage(favMessage)
     })
 
     onMounted(() => {
-      GetNameInitials(personInfo.nameInitials)
+      getNameInitials(personInfo.nameInitials)
     })
-    onUnmounted(() => {})
 
     return {
       props,
       state,
       personInfo,
       nameInitials,
-      GetNameInitials,
+      getNameInitials,
       getChat,
     }
   },

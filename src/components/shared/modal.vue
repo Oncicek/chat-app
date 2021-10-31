@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, watch } from 'vue'
+import { onMounted } from 'vue'
 
 export default {
   props: {

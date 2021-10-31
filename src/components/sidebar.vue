@@ -12,7 +12,7 @@
             <strong>{{ userNameOrig }}</strong>
           </div>
           <div class="col-2">
-            <button type="button" class="circle" @click="ShowEditComp(false)">
+            <button type="button" class="circle" @click="showEditComp(false)">
               <strong>{{ personInfo.editNamebtn }}</strong>
             </button>
           </div>
@@ -39,23 +39,23 @@
           <i class="bi-chevron-up"></i>
         </button>
       </div>
-      <favorites
+      <favorites-component
         v-if="personInfo.isShowFavs"
-        class="favoriteTab"
+        class="favorite-tab"
         v-for="favoritePerson in favoritePeople"
         :key="favoritePerson.id"
         :favoritePerson="favoritePerson"
-        @click="ShowEditComp(true)"
+        @click="showEditComp(true)"
       />
     </div>
     <div class="row">
       <header class="second-header">People</header>
-      <people
-        class="peopleTab"
+      <people-component
+        class="people-tab"
         v-for="person in people"
         :key="person.id"
         :person="person"
-        @click="ShowEditComp(true)"
+        @click="showEditComp(true)"
       />
     </div>
   </div>
@@ -63,8 +63,8 @@
 
 <script lang="ts">
 import { reactive, onMounted, ref, inject, watch, computed } from 'vue'
-import Favorites from './sidebar/favorites.vue'
-import People from './sidebar/people.vue'
+import FavoritesComponent from './sidebar/favorites.vue'
+import PeopleComponent from './sidebar/people.vue'
 
 export default {
   props: {
@@ -80,15 +80,12 @@ export default {
       type: String,
     },
   },
-  components: { Favorites, People },
+  components: { FavoritesComponent, PeopleComponent },
   setup(props: any) {
     const emitter: any = inject('emitter')
-    const inputUserName = ref('')
     const peopleSaved = ref(props.people)
 
     let userName = ref(props.userName)
-    let isLogged = ref('')
-    let infoTab = ref('')
     let editNamebtn = ref(props.userName)
     let isShowFavs = ref(true)
 
@@ -97,7 +94,7 @@ export default {
       isShowFavs: isShowFavs.value,
     })
 
-    const ShowEditComp = (isFromRow: boolean) => {
+    const showEditComp = (isFromRow: boolean) => {
       emitter.emit('show-edit-comp', isFromRow)
     }
 
@@ -106,7 +103,7 @@ export default {
       emitter.emit('show-favs-sidebar', personInfo.isShowFavs)
     }
 
-    const SwitchHeader = () => {
+    const switchHeader = () => {
       if (!userName.value) {
         return props.userNameOrig
       } else {
@@ -117,7 +114,7 @@ export default {
     watch(
       () => props.userNameOrig,
       () => {
-        GetNameInitials(props.userNameOrig)
+        getNameInitials(props.userNameOrig)
       }
     )
 
@@ -125,26 +122,28 @@ export default {
       personInfo.isShowFavs = !isFavsShown
     })
 
-    const GetNameInitials = (fullName: string) => {
+    const getNameInitials = (fullName: string) => {
       let name = fullName.split(' ')
-      personInfo.editNamebtn = name[0].charAt(0) + name[1].charAt(0)
+
+      if (name.length > 1) {
+        personInfo.editNamebtn = name[0].charAt(0) + name[1].charAt(0)
+      } else {
+        personInfo.editNamebtn = name[0].charAt(0) + name[0].charAt(1)
+      }
     }
 
     onMounted(() => {
-      GetNameInitials(props.userNameOrig)
+      getNameInitials(props.userNameOrig)
     })
 
     return {
-      inputUserName,
-      isLogged,
-      ShowEditComp,
-      infoTab,
+      showEditComp,
       userName,
-      SwitchHeader,
+      switchHeader,
       props,
       peopleSaved,
       personInfo,
-      GetNameInitials,
+      getNameInitials,
       showFavs,
     }
   },
@@ -156,19 +155,19 @@ header {
   padding-bottom: 20px;
 }
 
-.peopleTab:hover {
-  border: 0.5px solid lightgray;
+.people-tab:hover {
+  background-color: rgb(231, 229, 229);
 }
 
-.peopleTab {
+.people-tab {
   padding-top: 5px;
 }
 
-.favoriteTab:hover {
-  border: 0.5px solid lightgray;
+.favorite-tab:hover {
+  background-color: rgb(231, 229, 229);
 }
 
-.favoriteTab {
+.favorite-tab {
   padding-bottom: 5px;
 }
 

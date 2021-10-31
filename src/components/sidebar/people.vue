@@ -15,23 +15,23 @@
         {{ person.displayName }}
       </div>
       <div class="col-5">
-        <dropdown
+        <dropdown-component
           class="dropdown"
           :class="{ 'show-btn': state.hover }"
           :options="options"
           :userId="state.userId"
-        ></dropdown>
+        ></dropdown-component>
       </div>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, watch } from 'vue'
-import Dropdown from '../shared/dropdown.vue'
+import { reactive, onMounted, ref, inject } from 'vue'
+import DropdownComponent from '../shared/dropdown.vue'
 
 export default {
-  components: { Dropdown },
+  components: { DropdownComponent },
   props: {
     person: {
       type: Object,
@@ -62,13 +62,13 @@ export default {
       hover: false,
     })
 
-    const GetNameInitials = (fullName: string) => {
+    const getNameInitials = (fullName: string) => {
       let name = fullName.split(' ')
       personInfo.nameInitials = name[0].charAt(0) + name[1].charAt(0)
     }
 
     onMounted(() => {
-      GetNameInitials(personInfo.nameInitials)
+      getNameInitials(personInfo.nameInitials)
     })
 
     return {
@@ -76,7 +76,7 @@ export default {
       state,
       personInfo,
       nameInitials,
-      GetNameInitials,
+      getNameInitials,
       options,
       getChat,
     }

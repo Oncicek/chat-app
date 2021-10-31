@@ -2,7 +2,7 @@
   <div class="container main-container" v-if="isLoaded">
     <div class="row">
       <div class="col-5 sidebar-theme">
-        <sidebar
+        <sidebar-component
           :people="sidebarData"
           :userNameOrig="userFullname"
           :favoritePeople="favoriteData"
@@ -11,8 +11,8 @@
       <div class="col" v-if="isEditing">
         <edit :people="peopleData" />
       </div>
-      <div class="col chat-theme" v-if="!isEditing && userNameId > -1">
-        <chat
+      <div class="col chat-theme" v-if="!isEditing">
+        <chat-component
           :user="user"
           :chatSide="chatSide"
           :favoritePeople="favoriteData"
@@ -24,7 +24,7 @@
         "
         >
           <transition name="modal">
-            <modal @close="properties.showModal = false">
+            <modal-component @close="properties.showModal = false">
               <template v-slot:header>
                 <h3>Edit options</h3>
               </template>
@@ -52,14 +52,14 @@
                   </div>
                 </div>
               </template>
-            </modal>
+            </modal-component>
           </transition>
         </form>
       </div>
       <div v-if="login.isLogged < 0">
         <form @submit.prevent="loginToFirebase()">
           <transition name="modal">
-            <modal :backColor="1">
+            <modal-component :backColor="1">
               <template v-slot:header>
                 <h3>Please log in:</h3>
               </template>
@@ -84,7 +84,7 @@
                   Login
                 </button>
               </template>
-            </modal>
+            </modal-component>
           </transition>
         </form>
       </div>
@@ -93,16 +93,16 @@
 </template>
 
 <script lang="ts">
-import Sidebar from './components/sidebar.vue'
-import Chat from './components/chat.vue'
+import SidebarComponent from './components/sidebar.vue'
+import ChatComponent from './components/chat.vue'
 import Edit from './components/edit.vue'
-import Modal from './components/shared/modal.vue'
+import ModalComponent from './components/shared/modal.vue'
 import { reactive, onMounted, ref, inject, watch } from 'vue'
 import axios from 'axios'
 import firebase from './db'
 
 export default {
-  components: { Chat, Sidebar, Edit, Modal },
+  components: { ChatComponent, SidebarComponent, Edit, ModalComponent },
   setup() {
     const emitter: any = inject('emitter')
     const peopleData: any = ref([])
@@ -110,7 +110,6 @@ export default {
     let userName = ref('')
     let userFullname = ref('')
     let userNameId = ref(0)
-    let myFavoriteManuallyAdded = ref(-1)
     const user: any = ref([])
     let isLoaded = ref(false)
     const sidebarData: any = ref([])
@@ -121,10 +120,10 @@ export default {
     let userFromFav = ref(-1)
     let showModal = ref(false)
 
-    const FetchUsersData = async (forceFetch: boolean = false) => {
-      if (CachedData() && !forceFetch) {
+    const fetchUsersData = async (forceFetch: boolean = false) => {
+      if (cachedData() && !forceFetch) {
         login.isLogged = Number(localStorage.getItem('isLoggedIn'))
-        ShowData(peopleData.value)
+        showData(peopleData.value)
         isLoaded.value = true
         return
       }
@@ -135,7 +134,7 @@ export default {
         peopleData.value = response.data
         localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
 
-        ShowData(peopleData.value)
+        showData(peopleData.value)
 
         isLoaded.value = true
       }
@@ -166,7 +165,7 @@ export default {
 
     const saveEditChanges = () => {
       closeModal()
-      ShowData(peopleData.value)
+      showData(peopleData.value)
     }
 
     const cancelEditChanges = () => {
@@ -189,10 +188,10 @@ export default {
       properties.showModal = false
     }
 
-    const ShowData = (data: any) => {
-      GetUserData(data)
-      GetSidebarData(data)
-      GetFavoriteData(data)
+    const showData = (data: any) => {
+      getUserData(data)
+      getSidebarData(data)
+      getFavoriteData(data)
     }
 
     const state = reactive({
@@ -200,13 +199,13 @@ export default {
       userFromFav: userFromFav.value,
     })
 
-    const GetSidebarData = (originalData: any) => {
+    const getSidebarData = (originalData: any) => {
       sidebarData.value = originalData.filter((x: any) => x.active === false)
 
-      GetChat(sidebarData.value)
+      getChat(sidebarData.value)
     }
 
-    const GetUserData = (originalData: any) => {
+    const getUserData = (originalData: any) => {
       user.value = originalData.find((x: any) => x.active === true)
 
       userNameId.value = parseInt(user.value.id)
@@ -214,7 +213,7 @@ export default {
       userFullname.value = user.value.fullName
     }
 
-    const GetFavoriteData = (originalData: any) => {
+    const getFavoriteData = (originalData: any) => {
       originalData.forEach((x: any) => {
         if (x.id === state.userFromFav) {
           for (let i = 0; i < state.manAdded.length; i++) {
@@ -233,13 +232,9 @@ export default {
           originalData.find((y: any) => parseInt(y.id) === x)
         )
       })
-
-      console.log('manAdded: ', state.manAdded)
-      console.log('userFavorite: ', userFavorite.value)
-      console.log('favoriteData: ', favoriteData.value)
     }
 
-    const ShowEditComp = (isFromRow: boolean) => {
+    const showEditComp = (isFromRow: boolean) => {
       if (isFromRow) {
         isEditing.value = !isFromRow
       } else {
@@ -254,18 +249,21 @@ export default {
       }
     )
 
-    const GetChat = (originalData: any, chatId: number = 0) => {
-      chatSide.value = originalData[chatId]
+    const getChat = (originalData: any, chatId: number = 1) => {
+      originalData.forEach((x: any) => {
+        if (parseInt(x.id) == chatId) {
+          chatSide.value = x
+        }
+      })
     }
 
-    const UpdateFavorites = (chatIdParam: any) => {
+    const updateFavorites = (chatIdParam: any) => {
       let userId = userNameId.value
       let chatId = parseInt(chatIdParam)
 
       peopleData.value.forEach((x: any) => {
         if (parseInt(x.id) === userId) {
           let indexInFavs = x.myFavorites.indexOf(chatId)
-          console.log(x.myFavorites.indexOf(chatId))
           let indexInPeople = favoriteData.value.findIndex(
             (y: any) => parseInt(y.id) === chatId
           )
@@ -280,14 +278,13 @@ export default {
             x.myFavorites.splice(indexInFavs, 1)
             favoriteData.value.splice(indexInPeople, 1)
           }
-          console.log('Favorites: ', x.myFavorites)
         }
       })
 
       localStorage.setItem('fakeApi', JSON.stringify(peopleData.value))
     }
 
-    const CachedData = () => {
+    const cachedData = () => {
       if (localStorage.getItem('fakeApi')) {
         peopleData.value = JSON.parse(localStorage.getItem('fakeApi')!) || []
         return true //set false for debug
@@ -297,7 +294,22 @@ export default {
       }
     }
 
-    const DestroyPerson = (fromId: number) => {
+    const clearFavsBeforeDestroyPerson = (fromId: number) => {
+      let userId = userNameId.value
+
+      peopleData.value.forEach((x: any) => {
+        let indexInFavs = x.myFavorites.indexOf(fromId)
+        let indexInPeople = favoriteData.value.findIndex(
+          (y: any) => parseInt(y.id) === fromId
+        )
+        x.myFavorites.splice(indexInFavs, 1)
+        favoriteData.value.splice(indexInPeople, 1)
+      })
+    }
+
+    const destroyPerson = (fromId: number) => {
+      clearFavsBeforeDestroyPerson(fromId)
+
       let index: number = peopleData.value.findIndex(
         (person: any) => parseInt(person.id) == fromId
       )
@@ -319,9 +331,9 @@ export default {
           peopleData.value.find((x: any) => x.active === true)?.id
         )
 
-        GetSidebarData(peopleData.value)
-        GetUserData(peopleData.value)
-        GetFavoriteData(peopleData.value)
+        getSidebarData(peopleData.value)
+        getUserData(peopleData.value)
+        getFavoriteData(peopleData.value)
 
         sidebarData.value = peopleData.value.filter(
           (x: any) => x.active === false
@@ -338,31 +350,31 @@ export default {
     }
 
     onMounted(() => {
-      FetchUsersData()
+      fetchUsersData()
 
       emitter.on('get-chat', (chat: any) => {
-        GetChat(sidebarData.value, chat.id)
+        getChat(sidebarData.value, chat.id)
       })
 
       emitter.on('show-edit-comp', (isFromRow: boolean) => {
-        ShowEditComp(isFromRow)
+        showEditComp(isFromRow)
       })
 
       emitter.on('update-user', (id: number) => {
         updateUserData(id)
-        ShowData(peopleData.value)
+        showData(peopleData.value)
       })
 
       emitter.on('fav-from-people', (fromId: number) => {
-        UpdateFavorites(fromId)
+        updateFavorites(fromId)
       })
 
       emitter.on('destroy-from-people', (fromId: number) => {
-        DestroyPerson(fromId)
+        destroyPerson(fromId)
       })
 
       emitter.on('reset-config', () => {
-        FetchUsersData(true)
+        fetchUsersData(true)
         login.isLogged = -1
       })
 
@@ -380,7 +392,7 @@ export default {
       })
 
       emitter.on('add-to-favorites', (chatId: any) => {
-        UpdateFavorites(chatId)
+        updateFavorites(chatId)
       })
 
       emitter.on('show-modal', () => {
@@ -389,25 +401,24 @@ export default {
     })
 
     return {
-      ShowEditComp,
+      showEditComp,
       isEditing,
       userNameId,
       userName,
-      FetchUsersData,
+      fetchUsersData,
       peopleData,
       sidebarData,
       favoriteData,
-      GetSidebarData,
-      GetFavoriteData,
+      getSidebarData,
+      getFavoriteData,
       chatSide,
       userFavorite,
-      myFavoriteManuallyAdded,
       user,
       state,
       isLoaded,
-      UpdateFavorites,
-      CachedData,
-      DestroyPerson,
+      updateFavorites,
+      cachedData,
+      destroyPerson,
       userFullname,
       properties,
       closeModal,
@@ -416,7 +427,8 @@ export default {
       login,
       loginToFirebase,
       loginError,
-      GetChat,
+      getChat,
+      clearFavsBeforeDestroyPerson,
     }
   },
 }

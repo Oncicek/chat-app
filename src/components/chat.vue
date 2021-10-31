@@ -6,7 +6,7 @@
           <header>Conversation with {{ state.chatName }}</header>
         </div>
         <div class="col-1 fav-button">
-          <button @click="AddToFavorites(state.chatNameId)" id="fav-btn">
+          <button @click="addToFavorites(state.chatNameId)" id="fav-btn">
             <i v-if="state.isFavedBtn" class="bi-star"></i>
             <i v-else class="bi-star-fill" style="color: blue"></i>
           </button>
@@ -23,15 +23,16 @@
           "
         >
           <div class="message-inner">
-            <div class="username">{{ GetChatNames(message.userNameId) }}</div>
-            <div class="username"></div>
+            <div class="username">
+              {{ getChatNames(message.userNameId) }}
+            </div>
             <div class="content">{{ message.content }}</div>
           </div>
         </div>
       </section>
       <footer>
         <div class="input-wrapper">
-          <form @submit.prevent="SendMessage">
+          <form @submit.prevent="sendMessage">
             <input
               type="text"
               v-model="inputMessage"
@@ -74,17 +75,17 @@ export default {
     const state = reactive({
       chatName: props.chatSide['displayName'],
       chatNameId: props.chatSide['id'],
+      username: props.user['displayName'],
       userNameId: props.user['id'],
       conversationId: conversationId,
-      username: props.user['displayName'],
       isFavedBtn: isFavedBtn.value,
       favPeople: props.favoritePeople,
       messages: [],
       user: user,
     })
 
-    const SendMessage = () => {
-      GetConversationId()
+    const sendMessage = () => {
+      getConversationId()
       const messageRef = db.database().ref('message')
       if (inputMessage.value === '' || inputMessage.value === null) {
         return
@@ -102,42 +103,42 @@ export default {
       inputMessage.value = ''
     }
 
-    const GetConversationId = () => {
-      state.conversationId = CalcConvId(state.userNameId, state.chatNameId)
+    const getConversationId = () => {
+      state.conversationId = calcConvId(state.userNameId, state.chatNameId)
     }
 
     emitter.on('get-chat', (chat: any) => {
       state.chatNameId = chat.id
       state.chatName = chat.chatName
 
-      GetConversationId()
-      GetFreshData(state.conversationId)
+      getConversationId()
+      getFreshData(state.conversationId)
     })
 
     const messageRef = db.database().ref('message')
 
-    const GetFavoriteMessage = (favoritePeople: any, messages: any) => {
+    const getFavoriteMessage = (favoritePeople: any, messages: any) => {
       favoriteData.value = []
 
       for (let i = 0; i < favoritePeople.length; i++) {
         let favs: any = {
-          convId: CalcConvId(state.userNameId, favoritePeople[i].id) as number,
+          convId: calcConvId(state.userNameId, favoritePeople[i].id) as number,
           favoritePersonId: favoritePeople[i].id as number,
           lastMessage: '',
         }
 
-        favs.lastMessage = GetLastMessage(messages, favs)
+        favs.lastMessage = getLastMessage(messages, favs)
         favoriteData.value.push(favs)
       }
 
       emitter.emit('fav-message', favoriteData.value)
     }
 
-    const CalcConvId = (userNameId: string, chatNameId: any) => {
+    const calcConvId = (userNameId: string, chatNameId: any) => {
       return (parseInt(userNameId) + 1) * (parseInt(chatNameId) + 1)
     }
 
-    const GetLastMessage = (messages: any, favs: any) => {
+    const getLastMessage = (messages: any, favs: any) => {
       for (let j = messages.length - 1; j >= 0; j--) {
         if (messages[j].userNameId) {
           if (parseInt(messages[j].conversationId) === parseInt(favs.convId)) {
@@ -148,17 +149,17 @@ export default {
       }
     }
 
-    const AddToFavorites = (chatId: number) => {
+    const addToFavorites = (chatId: number) => {
       emitter.emit('add-to-favorites', chatId)
       emitter.emit('fav-message', favoriteData.value)
-      GetIsFavedBtn()
+      getIsFavedBtn()
     }
 
     emitter.on('update-user-favs', () => {
       emitter.emit('fav-message', favoriteData.value)
     })
 
-    const GetIsFavedBtn = () => {
+    const getIsFavedBtn = () => {
       let isFaved = Object.values(state.favPeople).findIndex(
         (x: any) => x.id === state.chatNameId
       )
@@ -170,7 +171,7 @@ export default {
       }
     }
 
-    const GetFreshData = (conversationId: number) => {
+    const getFreshData = (conversationId: number) => {
       messageRef.on('value', (snapshot) => {
         const data = snapshot.val()
         let messages: any = []
@@ -192,13 +193,13 @@ export default {
 
         clearedMsg.reverse()
 
-        GetFavoriteMessage(props.favoritePeople, messages)
-        GetIsFavedBtn()
+        getFavoriteMessage(props.favoritePeople, messages)
+        getIsFavedBtn()
         state.messages = clearedMsg
       })
     }
 
-    const GetChatNames = (usernameIdParam: number) => {
+    const getChatNames = (usernameIdParam: number) => {
       switch (usernameIdParam) {
         case state.chatNameId:
           return state.chatName
@@ -210,26 +211,22 @@ export default {
     }
 
     onMounted(() => {
-      GetIsFavedBtn()
-      GetConversationId()
-      GetFreshData(state.conversationId)
-    })
-
-    onUnmounted(() => {
-      emitter.off('get-chat')
+      getIsFavedBtn()
+      getConversationId()
+      getFreshData(state.conversationId)
     })
 
     return {
       state,
       inputMessage,
-      SendMessage,
-      GetFreshData,
+      sendMessage,
+      getFreshData,
       props,
-      CalcConvId,
+      calcConvId,
       favoriteData,
-      AddToFavorites,
-      GetIsFavedBtn,
-      GetChatNames,
+      addToFavorites,
+      getIsFavedBtn,
+      getChatNames,
     }
   },
 }

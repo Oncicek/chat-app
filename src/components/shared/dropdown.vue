@@ -3,12 +3,16 @@
     <button
       class="dd-button"
       type="button"
-      id="dropdownMenuButton"
+      id="dropdown-menu-button"
       data-bs-toggle="dropdown"
     >
       ...
     </button>
-    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" role="menu">
+    <ul
+      class="dropdown-menu"
+      aria-labelledby="dropdown-menu-button"
+      role="menu"
+    >
       <li v-for="option in options" :key="option.id">
         <a class="dropdown-item" @click="dropdownClick(option.id)">{{
           option.value
@@ -19,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, watch } from 'vue'
+import { reactive, onMounted, ref, inject } from 'vue'
 
 export default {
   props: {
@@ -36,11 +40,9 @@ export default {
   setup(props: any) {
     const emitter: any = inject('emitter')
     const options: any = ref(props.options)
-    let hover: any = ref(false)
 
     const state = reactive({
       options: options.value,
-      hover: hover.value,
     })
 
     const dropdownClick = (optionId: number) => {
@@ -77,9 +79,16 @@ export default {
   border-radius: 20px;
 }
 
+.dropdown-menu > li:first-child > a:hover {
+  border-radius: 20px 20px 2px 2px;
+}
+
+.dropdown-menu > li:last-child > a:hover {
+  border-radius: 2px 2px 20px 20px;
+}
+
 .dropdown-item:hover {
   background-color: dodgerblue;
   color: white;
-  border-radius: 12px;
 }
 </style>

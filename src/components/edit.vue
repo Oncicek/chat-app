@@ -104,7 +104,7 @@
 </template>
 
 <script lang="ts">
-import { reactive, onMounted, ref, inject, watch } from 'vue'
+import { reactive, onMounted, ref, inject } from 'vue'
 
 export default {
   props: {
@@ -120,13 +120,10 @@ export default {
     const user: any = ref([])
     let isShowFavs = ref(true)
     let showAlert = ref(false)
-    let showModal = ref(false)
     let alertText = ref('')
-    showAlert.value = false
 
     const state = reactive({
       showAlert: showAlert.value,
-      showModal: showModal.value,
       alertText: alertText.value,
       isShowFavs: isShowFavs.value,
     })
@@ -210,7 +207,6 @@ export default {
   padding-bottom: 25px;
 }
 
-/* Hide default HTML checkbox */
 .switch input {
   opacity: 0;
   width: 0;
@@ -222,7 +218,6 @@ p {
   font-weight: 300;
 }
 
-/* The slider */
 .slider {
   position: absolute;
   cursor: pointer;
@@ -265,7 +260,6 @@ input:checked + .slider:before {
   padding-top: 10px;
 }
 
-/* Rounded sliders */
 .slider.round {
   border-radius: 34px;
 }
