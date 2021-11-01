@@ -160,7 +160,7 @@ header {
 }
 
 .people-tab {
-  padding-top: 5px;
+  padding: 2px 0px 2px 10px;
 }
 
 .favorite-tab:hover {
@@ -168,7 +168,7 @@ header {
 }
 
 .favorite-tab {
-  padding-bottom: 5px;
+  padding: 2px 0px 2px 10px;
 }
 
 .first-row {

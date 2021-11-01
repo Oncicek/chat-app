@@ -105,6 +105,7 @@ export default {
 
 .fav-content {
   padding-left: 25px;
+  padding-top: 3px;
   line-height: normal;
 }
 

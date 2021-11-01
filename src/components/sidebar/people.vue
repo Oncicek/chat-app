@@ -11,10 +11,10 @@
           {{ personInfo.nameInitials }}
         </div>
       </div>
-      <div class="col-6">
+      <div class="col-10 display-name">
         {{ person.displayName }}
       </div>
-      <div class="col-5">
+      <div class="col-1 dropdown-wrapper">
         <dropdown-component
           class="dropdown"
           :class="{ 'show-btn': state.hover }"
@@ -100,6 +100,15 @@ export default {
 
 .dropdown {
   display: none;
+}
+
+.display-name {
+  padding-top: 2px;
+}
+
+.dropdown-wrapper {
+  padding-top: 2px;
+  float: right;
 }
 
 .show-btn {

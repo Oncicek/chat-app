@@ -75,6 +75,10 @@ export default {
   border: 0;
 }
 
+.dropdown-container {
+  padding-right: 15px;
+}
+
 .dropdown-menu {
   border-radius: 20px;
 }
