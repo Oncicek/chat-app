@@ -224,6 +224,10 @@ header {
   border: 0px !important;
 }
 
+.chevron-btn {
+  background-color: #f8eff1;
+}
+
 .circles > i {
   padding-left: 5px;
   font-size: 13px;
