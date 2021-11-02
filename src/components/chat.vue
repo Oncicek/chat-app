@@ -285,11 +285,11 @@ export default {
     flex-direction: column;
     padding-bottom: 4vh;
     .chat-box {
+      overflow-y: auto;
       flex-direction: column-reverse;
       display: flex;
       max-height: 80vh;
       min-height: 80vh;
-      overflow-y: scroll;
       background-color: #fff;
       box-shadow: 0px 0px 12px rgba(100, 100, 100, 0.2);
       flex: 1 1 100%;
