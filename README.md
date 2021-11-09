@@ -25,5 +25,9 @@ npm run build
 npm run lint
 ```
 
+## LOGIN:
+Email: lacika@kutyil.sk
+Pwd: andrejka
+
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
