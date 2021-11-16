@@ -1,5 +1,7 @@
 # mustafar-chat-app
 
+# Firebase test database expired. Should you want to try my app out, please contact me on kralik.tomase@gmail.com and I´ll setup a new one.
+
 ## Project setup
 ```
 npm install
@@ -28,8 +30,6 @@ npm run lint
 ## LOGIN:
 Email: lacika@kutyil.sk
 Pwd: andrejka
-
-# Firebase test database expired. Should you want to try my app out, please contact me on kralik.tomase@gmail.com and I´ll setup a new one.
 
 ### Customize configuration
 See [Configuration Reference](https://cli.vuejs.org/config/).
