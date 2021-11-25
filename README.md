@@ -1,4 +1,4 @@
-# mustafar-chat-app
+# chat-app
 
 # Firebase test database expired. Should you want to try my app out, please contact me on kralik.tomase@gmail.com and I´ll setup a new one.
 
