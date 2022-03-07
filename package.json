@@ -23,7 +23,8 @@
     "firebase-admin": "^10.0.0",
     "mitt": "^3.0.0",
     "vue": "^3.2.20",
-    "vue-class-component": "^8.0.0-0"
+    "vue-class-component": "^8.0.0-0",
+    "vue-cli-plugin-s3-deploy": "^4.0.0-rc4"
   },
   "devDependencies": {
     "@types/electron-devtools-installer": "^2.2.0",
